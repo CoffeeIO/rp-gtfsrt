@@ -94,8 +94,24 @@ exceptions, after-midnight trips, opposite-direction trips at the same minute
 and a filtered bus route. `internal/e2e` runs the whole pipeline against a fake
 API and decodes the served protobuf.
 
-Before offering this to an operator, validate a live feed with MobilityData's
-[GTFS-Realtime validator](https://github.com/MobilityData/gtfs-realtime-validator).
+## Validation
+
+Live feed snapshots were checked with MobilityData's
+[GTFS-Realtime validator](https://github.com/MobilityData/gtfs-realtime-validator)
+(batch mode, against an S-tog-only subset of the Rejseplanen GTFS) on 2026-10-08:
+**0 errors**. Remaining warnings:
+
+| Rule | Why |
+|---|---|
+| W002 `vehicle_id` not populated | The Rejseplanen API exposes no vehicle id. |
+| W007 refresh interval > 35 s | Free-key API budget allows about one poll per minute. Goes away with operator access. |
+
+```sh
+go run ./cmd/gtfs-subset gtfs.zip stog.zip 109     # S-tog only (route_type 109)
+# validator lib jar built from source (needs Java 17)
+java -jar gtfs-realtime-validator-lib-1.0.0-SNAPSHOT-withAllDependencies.jar \
+  -gtfs stog.zip -gtfsRealtimePath snapshots/ -sort name
+```
 
 ## Status / open questions
 
@@ -104,8 +120,10 @@ Before offering this to an operator, validate a live feed with MobilityData's
 - [x] API stop ids: `stopExtId` is `8600626`, GTFS has `000008600626`;
       leading-zero normalization matches them without aliases.
 - [x] Matcher round-trip on real GTFS: 1782/1782 S-tog hub departures on 2026-10-08
-- [ ] Measure match rate on live data (`/healthz` → `poller.outcomes`).
-- [ ] Run the validator against a live feed.
+- [x] Live match rate, 10 min at København H + Nørreport: 1345/1345 departures matched, 0 errors.
+- [x] Cancellations confirmed live (`"cancelled": true`, no `prognosisType`); both
+      cancelled Bx trains in a 3-hour board matched their GTFS trips.
+- [x] GTFS-RT validator: 0 errors on live snapshots (see Validation).
 - [ ] Ask Rejseplanen whether their HAFAS backend can already export GTFS-RT.
 
 ## Data and licence

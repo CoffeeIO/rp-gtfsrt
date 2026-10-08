@@ -78,6 +78,9 @@ func TestObserveBuildsTripUpdate(t *testing.T) {
 		t.Fatalf("stop updates = %d", len(tu.StopTimeUpdate))
 	}
 	stu := tu.StopTimeUpdate[0]
+	if stu.ScheduleRelationship == nil || stu.GetScheduleRelationship() != rt.TripUpdate_StopTimeUpdate_SCHEDULED {
+		t.Fatal("stop_time_update schedule_relationship must be set explicitly (validator W009)")
+	}
 	if stu.GetStopSequence() != 1 || stu.GetStopId() != "8600626-1" {
 		t.Fatalf("stop update = %v", stu)
 	}

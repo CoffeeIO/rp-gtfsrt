@@ -92,3 +92,48 @@ func envOr(key, def string) string {
 	}
 	return def
 }
+
+// TestRealBoardCapture runs a captured live departure board through the
+// matcher against the real GTFS. Rows on lines outside the loaded routes are
+// ignored. No API calls:
+//
+//	RP_GTFS_ZIP=data/gtfs.zip RP_BOARD_JSON=board.json go test ./internal/matcher -run RealBoard -v
+func TestRealBoardCapture(t *testing.T) {
+	zipPath, boardPath := os.Getenv("RP_GTFS_ZIP"), os.Getenv("RP_BOARD_JSON")
+	if zipPath == "" || boardPath == "" {
+		t.Skip("RP_GTFS_ZIP and RP_BOARD_JSON not set")
+	}
+	lines := map[string]bool{"A": true, "B": true, "BX": true, "C": true, "E": true, "F": true, "H": true}
+	s, err := gtfs.LoadZip(zipPath, gtfs.Filter{RouteShortNames: lines}, cph)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, err := os.ReadFile(boardPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	deps, err := rejseplanen.ParseDepartureBoard(body, "", cph)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := &Matcher{Schedule: s}
+	outcomes := map[Outcome]int{}
+	cancelled := 0
+	for _, d := range deps {
+		if !lines[gtfs.NormalizeLine(d.Line)] {
+			continue
+		}
+		match, outcome := m.Match(d)
+		outcomes[outcome]++
+		if outcome != Matched {
+			t.Errorf("%v: %s %s → %s", outcome, d.Line, d.Scheduled.Format("15:04"), d.Direction)
+			continue
+		}
+		if d.Cancelled {
+			cancelled++
+			t.Logf("cancelled %s %s → %s matched trip %s", d.Line, d.Scheduled.Format("15:04"), d.Direction, match.Trip.ID)
+		}
+	}
+	t.Logf("matched %d, no candidate %d, ambiguous %d, of which cancelled %d",
+		outcomes[Matched], outcomes[NoCandidate], outcomes[Ambiguous], cancelled)
+}

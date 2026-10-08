@@ -136,6 +136,8 @@ func (s *Store) Message(now time.Time) *rt.FeedMessage {
 				tu.StopTimeUpdate = append(tu.StopTimeUpdate, &rt.TripUpdate_StopTimeUpdate{
 					StopSequence: proto.Uint32(uint32(o.sequence)),
 					StopId:       proto.String(o.stopID),
+					// Explicit although it is the default; validators flag it (W009).
+					ScheduleRelationship: rt.TripUpdate_StopTimeUpdate_SCHEDULED.Enum(),
 					Departure: &rt.TripUpdate_StopTimeEvent{
 						Delay: proto.Int32(int32(o.delay / time.Second)),
 						Time:  proto.Int64(o.predicted.Unix()),

@@ -206,3 +206,22 @@ func TestPrognosisWithoutRtTimeIsOnTime(t *testing.T) {
 		t.Fatal("row without prognosisType has no realtime data")
 	}
 }
+
+// Captured from the live API: cancelled S-tog departures at København H.
+func TestParseLiveCancelled(t *testing.T) {
+	deps, err := rejseplanen.ParseDepartureBoard(fixture(t, "departureboard_live_cancelled_20261008.json"), "8600626", cph)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(deps) != 2 {
+		t.Fatalf("got %d departures", len(deps))
+	}
+	for _, d := range deps {
+		if !d.Cancelled || d.Realtime != nil || d.Line != "Bx" || d.StopID != "8600626" {
+			t.Errorf("cancelled row = %+v", d)
+		}
+	}
+	if !deps[0].Scheduled.Equal(at(8, 15, 9)) || deps[0].Direction != "Buddinge St." {
+		t.Fatalf("first = %+v", deps[0])
+	}
+}

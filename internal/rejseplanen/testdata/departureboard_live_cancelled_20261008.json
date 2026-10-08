@@ -1,0 +1,82 @@
+{
+  "Departure": [
+    {
+      "JourneyDetailRef": {
+        "ref": "2|#VN#1#ST#1791273300#PI#0#ZI#59102#TA#0#DA#81026#1S#8600798#1T#1445#LS#8600690#LT#1531#PU#86#RT#3#CA#006#ZE#Bx#ZB#Bx#PC#4#FR#8600798#FT#1445#TO#8600690#TT#1531#"
+      },
+      "JourneyStatus": "P",
+      "ProductAtStop": {
+        "name": "Bx",
+        "internalName": "Bx",
+        "displayNumber": "Bx",
+        "num": "625145",
+        "line": "Bx",
+        "lineId": "006_000022_Bx",
+        "catOut": "S-Tog",
+        "catIn": "006",
+        "catCode": "4",
+        "cls": "16",
+        "catOutS": "006",
+        "catOutL": "S-Tog",
+        "operatorCode": "DSB",
+        "operator": "DSB S-tog",
+        "admin": "000022",
+        "matchId": "Bx"
+      },
+      "name": "Bx",
+      "type": "ST",
+      "stop": "København H",
+      "stopid": "A=1@O=København H@X=12565562@Y=55673063@U=86@L=8600626@",
+      "stopExtId": "8600626",
+      "lon": 12.565562,
+      "lat": 55.673063,
+      "isMainMast": true,
+      "time": "15:09:00",
+      "date": "2026-10-08",
+      "cancelled": true,
+      "reachable": false,
+      "direction": "Buddinge St.",
+      "directionFlag": "1",
+      "rtCnclDataSourceType": "DEFAULT"
+    },
+    {
+      "JourneyDetailRef": {
+        "ref": "2|#VN#1#ST#1791273300#PI#0#ZI#59160#TA#0#DA#81026#1S#8600690#1T#1545#LS#8600798#LT#1631#PU#86#RT#3#CA#006#ZE#Bx#ZB#Bx#PC#4#FR#8600690#FT#1545#TO#8600798#TT#1631#"
+      },
+      "JourneyStatus": "P",
+      "ProductAtStop": {
+        "name": "Bx",
+        "internalName": "Bx",
+        "displayNumber": "Bx",
+        "num": "625248",
+        "line": "Bx",
+        "lineId": "006_000022_Bx",
+        "catOut": "S-Tog",
+        "catIn": "006",
+        "catCode": "4",
+        "cls": "16",
+        "catOutS": "006",
+        "catOutL": "S-Tog",
+        "operatorCode": "DSB",
+        "operator": "DSB S-tog",
+        "admin": "000022",
+        "matchId": "Bx"
+      },
+      "name": "Bx",
+      "type": "ST",
+      "stop": "København H",
+      "stopid": "A=1@O=København H@X=12565562@Y=55673063@U=86@L=8600626@",
+      "stopExtId": "8600626",
+      "lon": 12.565562,
+      "lat": 55.673063,
+      "isMainMast": true,
+      "time": "16:08:00",
+      "date": "2026-10-08",
+      "cancelled": true,
+      "reachable": false,
+      "direction": "Høje Taastrup St.",
+      "directionFlag": "0",
+      "rtCnclDataSourceType": "DEFAULT"
+    }
+  ]
+}
