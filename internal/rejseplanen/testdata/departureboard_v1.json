@@ -1,0 +1,19 @@
+{
+  "DepartureBoard": {
+    "noNamespaceSchemaLocation": "http://xmlopen.rejseplanen.dk/xml/rest/hafasRestDepartureBoard.xsd",
+    "Departure": {
+      "name": "S-tog A",
+      "type": "S",
+      "stop": "København H",
+      "time": "08:12",
+      "date": "08.10.26",
+      "id": "8600626",
+      "line": "A",
+      "rtTime": "08:13",
+      "rtDate": "08.10.26",
+      "finalStop": "Hillerød St.",
+      "cancelled": "true",
+      "track": "9"
+    }
+  }
+}

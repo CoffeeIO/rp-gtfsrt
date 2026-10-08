@@ -1,0 +1,52 @@
+{
+  "Departure": [
+    {
+      "name": "A",
+      "type": "S",
+      "stop": "København H",
+      "stopid": "A=1@O=København H@X=12564590@Y=55672731@U=86@L=000008626@",
+      "stopExtId": "000008626",
+      "time": "08:12:00",
+      "date": "2026-10-08",
+      "rtTime": "08:15:00",
+      "rtDate": "2026-10-08",
+      "direction": "Hillerød St.",
+      "track": "9",
+      "rtTrack": "10",
+      "ProductAtStop": {"name": "A", "line": "A", "catOut": "S-tog"},
+      "Product": [{"name": "A", "line": "A"}]
+    },
+    {
+      "name": "B",
+      "type": "S",
+      "stop": "København H",
+      "stopExtId": "000008626",
+      "time": "08:14:00",
+      "date": "2026-10-08",
+      "direction": "Høje Taastrup St.",
+      "track": "11",
+      "Product": {"name": "B", "line": "B"}
+    },
+    {
+      "name": "C",
+      "type": "S",
+      "stopExtId": "000008626",
+      "time": "08:20:00",
+      "date": "2026-10-08",
+      "rtTime": "08:20:00",
+      "direction": "Ballerup St.",
+      "cancelled": true,
+      "ProductAtStop": {"name": "C"}
+    },
+    {
+      "name": "F",
+      "type": "S",
+      "stopExtId": "000008626",
+      "time": "23:58:00",
+      "date": "2026-10-08",
+      "rtTime": "00:03:00",
+      "rtDate": "2026-10-09",
+      "direction": "Hellerup St."
+    }
+  ]
+}

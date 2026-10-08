@@ -1,0 +1,22 @@
+name: real-gtfs
+# Nightly: download Rejseplanen's public GTFS and replay today's S-tog hub
+# departures through the matcher. No API key needed.
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+jobs:
+  realfeed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Download GTFS
+        run: curl -fsSL --retry 3 -o gtfs.zip https://www.rejseplanen.info/labs/GTFS.zip
+      - name: Matcher round-trip
+        env:
+          RP_GTFS_ZIP: ${{ github.workspace }}/gtfs.zip
+          TZ: Europe/Copenhagen
+        run: RP_DATE=$(date +%F) go test ./internal/matcher -run RealFeed -v -count=1
