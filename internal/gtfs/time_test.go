@@ -54,11 +54,11 @@ func TestServiceDayStart(t *testing.T) {
 func TestCandidatesOnDSTDay(t *testing.T) {
 	s := load(t, gtfsFixtureWeekdayEveryDay(), stogFilter())
 	// On spring-forward Sunday a GTFS 08:12:00 departure is 08:12 wall clock.
-	ms := s.Candidates("8600626", "B", at(2026, 3, 29, 8, 12))
+	ms := s.Candidates("8600695", at(2026, 3, 29, 8, 40), true)
 	if len(ms) != 1 || ms[0].Trip.ID != "B1" {
-		t.Fatalf("matches = %v", tripIDs(ms))
+		t.Fatalf("matches = %v", ids(ms))
 	}
-	if got := s.ScheduledAt(ms[0], ms[0].StopIndex); !got.Equal(at(2026, 3, 29, 8, 12)) {
+	if got := s.ScheduledDeparture(ms[0], 0); !got.Equal(at(2026, 3, 29, 8, 12)) {
 		t.Fatalf("ScheduledAt = %v", got)
 	}
 }

@@ -24,13 +24,13 @@ import (
 var Fixture = map[string]string{
 	"agency.txt": "agency_id,agency_name,agency_url,agency_timezone\n" +
 		"DSB,DSB S-tog,https://www.dsb.dk,Europe/Copenhagen\n",
-	"stops.txt": "\uFEFFstop_id,stop_code,stop_name,location_type,parent_station\n" +
-		"8600626,,København H,1,\n" +
-		"8600626-1,,København H spor 9,0,8600626\n" +
-		"8600646,8646,Nørreport St.,0,\n" +
-		"8600669,,Hillerød St.,0,\n" +
-		"8600601,,Hundige St.,0,\n" +
-		"8600695,,Høje Taastrup St.,0,\n",
+	"stops.txt": "\uFEFFstop_id,stop_code,stop_name,stop_lat,stop_lon,location_type,parent_station\n" +
+		"8600626,,København H,55.672991,12.564502,1,\n" +
+		"8600626-1,,København H spor 9,55.673063,12.565562,0,8600626\n" +
+		"8600646,8646,Nørreport St.,55.683436,12.571545,0,\n" +
+		"8600669,,Hillerød St.,55.927532,12.310786,0,\n" +
+		"8600601,,Hundige St.,55.596233,12.333476,0,\n" +
+		"8600695,,Høje Taastrup St.,55.648967,12.269375,0,\n",
 	"routes.txt": "route_id,agency_id,route_short_name,route_long_name,route_type\n" +
 		"rA,DSB,A,,109\n" +
 		"rB,DSB,B,,109\n" +
@@ -67,7 +67,7 @@ var Fixture = map[string]string{
 		"W1,08:50:00,08:50:00,8600669,2\n" +
 		"X1,09:00:00,09:00:00,8600626-1,1\n" +
 		"X1,09:38:00,09:38:00,8600669,2\n" +
-		"BUS,08:12:00,08:12:00,8600626,1\n" +
+		"BUS,08:12:00,08:12:00,8600626-1,1\n" +
 		"BUS,08:30:00,08:30:00,8600646,2\n",
 }
 

@@ -1,4 +1,5 @@
-// Package rejseplanen talks to the Rejseplanen Labs departure board API.
+// Package rejseplanen talks to the Rejseplanen Labs API (HAFAS ReST):
+// departureBoard, journeyDetail and himsearch.
 //
 // The decoder accepts both the HAFAS ReST (API 2.0) JSON shape
 // ({"Departure":[{"time":"08:12:00","date":"2026-10-08",...}]}) and the
@@ -27,6 +28,17 @@ type Departure struct {
 	// the schedule (prognosisType set, rtTime omitted) is Scheduled.
 	Realtime  *time.Time
 	Cancelled bool
+	// JourneyRef is the journeyDetail reference for this departure, if any.
+	JourneyRef string
+}
+
+// JourneyKey identifies the journey instance (see KeyFromRef). Without a
+// ref it falls back to stop, line and scheduled time.
+func (d Departure) JourneyKey() string {
+	if k := KeyFromRef(d.JourneyRef); k != "" {
+		return k
+	}
+	return "dep:" + d.StopID + "|" + d.Line + "|" + d.Scheduled.Format(time.RFC3339)
 }
 
 // Delay is realtime minus scheduled; zero without a prediction.
@@ -43,20 +55,23 @@ type rawProduct struct {
 }
 
 type rawDeparture struct {
-	Name          string          `json:"name"`
-	Line          string          `json:"line"`
-	StopID        string          `json:"stopid"`
-	StopExtID     string          `json:"stopExtId"`
-	Time          string          `json:"time"`
-	Date          string          `json:"date"`
-	RtTime        string          `json:"rtTime"`
-	RtDate        string          `json:"rtDate"`
-	Direction     string          `json:"direction"`
-	FinalStop     string          `json:"finalStop"`
-	Track         string          `json:"track"`
-	RtTrack       string          `json:"rtTrack"`
-	PrognosisType string          `json:"prognosisType"`
-	Cancelled     flexBool        `json:"cancelled"`
+	Name          string   `json:"name"`
+	Line          string   `json:"line"`
+	StopID        string   `json:"stopid"`
+	StopExtID     string   `json:"stopExtId"`
+	Time          string   `json:"time"`
+	Date          string   `json:"date"`
+	RtTime        string   `json:"rtTime"`
+	RtDate        string   `json:"rtDate"`
+	Direction     string   `json:"direction"`
+	FinalStop     string   `json:"finalStop"`
+	Track         string   `json:"track"`
+	RtTrack       string   `json:"rtTrack"`
+	PrognosisType string   `json:"prognosisType"`
+	Cancelled     flexBool `json:"cancelled"`
+	JourneyDetail *struct {
+		Ref string `json:"ref"`
+	} `json:"JourneyDetailRef"`
 	ProductAtStop *rawProduct     `json:"ProductAtStop"`
 	Product       json.RawMessage `json:"Product"`
 }
@@ -148,6 +163,9 @@ func (r rawDeparture) normalize(requestedStop string, loc *time.Location) (Depar
 		Track:     firstNonEmpty(r.RtTrack, r.Track),
 		Scheduled: sched,
 		Cancelled: bool(r.Cancelled),
+	}
+	if r.JourneyDetail != nil {
+		d.JourneyRef = r.JourneyDetail.Ref
 	}
 	if r.RtTime != "" {
 		rt, err := parseDateTime(firstNonEmpty(r.RtDate, r.Date), r.RtTime, loc)

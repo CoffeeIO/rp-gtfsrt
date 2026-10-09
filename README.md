@@ -1,132 +1,121 @@
 # rp-gtfsrt
 
 [![ci](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/ci.yml/badge.svg)](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/ci.yml)
+[![conformance](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/conformance.yml/badge.svg)](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/conformance.yml)
 [![real-gtfs](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/realfeed.yml/badge.svg)](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/realfeed.yml)
 
-An open-source bridge that turns Rejseplanen's live departure data into a
-**GTFS-Realtime TripUpdates** feed, so that apps like Google Maps, Apple Maps,
-Transit and Transitous can show real Danish departure times and delays.
+Open-source bridge that turns Rejseplanen's realtime data into
+**GTFS-Realtime** (TripUpdates, VehiclePositions and Alerts) for every
+train, metro, light rail and bus in Denmark, so Google Maps, Apple Maps and
+other journey planners can show real departure times, delays and
+cancellations.
+
+> 🇩🇰 [Kort resumé på dansk](docs/resume-da.md)
 
 ## Why
 
 Google Maps in Denmark shows scheduled times only. Google gets Danish
-timetables as static GTFS (from Rejseplanen), but realtime needs a separate
-GTFS-Realtime feed sent by the operator, and none is published. The delay data
-exists: Rejseplanen, DSB and the regional apps all show it.
+timetables as static GTFS, but realtime needs a separate GTFS-Realtime feed,
+and none is published. The data exists: Rejseplanen, DSB and the regional
+apps all show it. This project is that missing feed, ready for an operator
+to run.
 
-This project is that missing feed, built in the open, for an operator to run.
-
-## How it works
+## What it does
 
 ```
-Rejseplanen GTFS.zip (weekly) ──► schedule index: (stop, line, minute, service day) → trip_id
-Rejseplanen API departureBoard ──► departures with time / rtTime / cancelled
-                                   │
-                         matcher ──┘  picks exactly one GTFS trip per departure,
-                                      disambiguating by direction; ambiguous → dropped
-                                   │
-                           store ──► /gtfs-rt/trip-updates   (protobuf, GTFS-RT 2.0)
+Rejseplanen GTFS (static) ─► compact national schedule (4.2M stop times, ~425 MB)
+                                         │
+Rejseplanen API ─ departureBoard ─┐      │
+                ─ journeyDetail  ─┼─► store ─► matcher ─► /gtfs-rt/trip-updates
+                ─ himsearch      ─┘                      /gtfs-rt/vehicle-positions
+                                                         /gtfs-rt/alerts
 ```
 
-* Delays are published as `StopTimeUpdate`s at the polled hub stops.
-  GTFS-RT consumers propagate a delay to the stops after it.
-* Cancelled departures become `CANCELED` trips.
-* Trips past midnight (`24:30:00`) and DST changes follow the GTFS
-  service day (noon − 12h).
-* The live API sets `prognosisType` (`PROGNOSED`/`CALCULATED`) on every
-  tracked departure and omits `rtTime` when it equals the schedule. Such rows
-  are published as delay 0, which also clears a delay once a train recovers.
-  Rows without `prognosisType` carry no realtime data and are skipped
-  (`-assume-on-time` publishes them as on time instead).
+* **Every stop of every trip.** Departure boards at a computed set of
+  discovery stations find journeys; journeyDetail gives each journey's full
+  stop list with live arrival and departure times.
+* **Matched to the static GTFS by stop sequence and time**, not by line
+  names, so it works across all modes. Ambiguous matches are dropped rather
+  than guessed.
+* **Cancellations**: whole-trip `CANCELED`, or `SKIPPED` stops for partial
+  cancellations.
+* **Vehicle positions** from the API's last known position.
+* **Service alerts** from Rejseplanen traffic information, attached to the
+  affected stops (Danish text).
+* **Safe GTFS reloads**: observations are stored raw and re-matched when the
+  weekly timetable (and its trip_ids) changes.
+* **Two pacing modes**: `budget` keeps a free Labs key under its monthly
+  quota; `rate` runs at a fixed calls/second for an operator.
+* **Operable**: Docker image, Compose profiles, Prometheus `/metrics`,
+  `/healthz`, gzip and ETag on feeds.
 
-## Demo scope and the API budget
+## Results (2026-10-08/09)
 
-The free Rejseplanen Labs key is limited (reportedly 50,000 calls/month). That
-cannot cover the whole country, so the demo polls a few **S-tog hub stations**
-and paces itself to stay within `-monthly-budget`, spread over the service
-hours (`-active-from` / `-active-to`). Usage is persisted in `data/budget.json`.
+| Check | Result |
+|---|---|
+| Every trip in Denmark on one day (44,319), all modes, through the journey matcher | 44,276 matched, 43 ambiguous (duplicate trips in the GTFS), **0 wrong** |
+| Live API, S-tog hubs, 10 minutes | 1,345 / 1,345 departures matched |
+| Live API with journeyDetail | 33 / 33 journeys matched, full-trip updates with per-stop delays |
+| Live cancellations | both cancelled Bx trains matched their GTFS trips |
+| MobilityData GTFS-Realtime validator | **0 errors** (live snapshots, CI fixture, nightly real S-tog) |
+| National load test against the simulator | 2,019 stations, 4,800 journey calls in 3 min, 0 errors, render 0.1 s, 327 MB |
 
-Run by Rejseplanen or an operator with unrestricted access, the same code
-covers every line: list more hubs, or feed it from their internal systems.
-
-## Usage
+## Quick start
 
 ```sh
-# find hub stop ids in the static feed
-go run ./cmd/rp-gtfsrt stops "København H"
+# No API key: simulated Rejseplanen API, whole country
+docker compose --profile simulator up
 
-# serve the feed
-RP_ACCESS_ID=your-key go run ./cmd/rp-gtfsrt serve \
-  -hubs 8600626,8600646      # København H, Nørreport
+# Free Labs key: S-tog demo within the monthly budget
+echo RP_ACCESS_ID=your-key > .env
+docker compose --profile demo up
 
-curl localhost:8080/gtfs-rt/trip-updates?format=json   # readable
-curl localhost:8080/gtfs-rt/trip-updates               # protobuf
-curl localhost:8080/healthz                            # stats + budget
+# Operator: every trip in Denmark
+docker compose --profile operator up
 ```
 
-Every flag can also be set as an `RP_*` environment variable (`-access-id` →
-`RP_ACCESS_ID`, `-hubs` → `RP_HUBS`, ...). Run `rp-gtfsrt serve -h` for all of them.
+Then open `http://localhost:8080/gtfs-rt/trip-updates?format=json`.
 
-**Stop ids.** The API uses zero-padded ids (e.g. `000052887`). Matching
-ignores leading zeros and also tries `stop_code` and `parent_station`. Where
-the API and GTFS ids still differ, map them with `-stop-aliases`.
-
-### Docker
+Without Docker:
 
 ```sh
-docker build -t rp-gtfsrt .
-docker run -p 8080:8080 -v $PWD/data:/data -e RP_ACCESS_ID=... -e RP_HUBS=... rp-gtfsrt
+go run ./cmd/rp-gtfsrt plan-stops -out stops.txt          # discovery stations
+RP_ACCESS_ID=... go run ./cmd/rp-gtfsrt serve -stops-file stops.txt -mode rate -rate 50 -journeys all
 ```
 
-## Tests
+## Documentation
 
-```sh
-make test     # unit + end-to-end, no network
-make race     # with the race detector (what CI runs)
-make cover
-RP_ACCESS_ID=... RP_LIVE_STOP=8600626 make live   # one real API call
-make realfeed                       # real GTFS, no API: replay a day through the matcher
-```
-
-The suite uses a small hand-written S-tog GTFS fixture
-(`internal/gtfs/gtfstest`) that covers platform/parent stops, calendar
-exceptions, after-midnight trips, opposite-direction trips at the same minute
-and a filtered bus route. `internal/e2e` runs the whole pipeline against a fake
-API and decodes the served protobuf.
+* [Operator guide](docs/operator-guide.md): deployment, configuration, sizing, monitoring
+* [Publishing to Google Maps and others](docs/google-transit.md)
+* [Architecture and data notes](docs/architecture.md): matching, API behaviour, limitations
 
 ## Validation
 
-Live feed snapshots were checked with MobilityData's
-[GTFS-Realtime validator](https://github.com/MobilityData/gtfs-realtime-validator)
-(batch mode, against an S-tog-only subset of the Rejseplanen GTFS) on 2026-10-08:
-**0 errors**. Remaining warnings:
+The feeds are checked with MobilityData's
+[GTFS-Realtime validator](https://github.com/MobilityData/gtfs-realtime-validator):
+on every push against the test fixture, nightly against the real S-tog
+timetable (`.github/workflows/conformance.yml`), and on live snapshots.
+Result: **0 errors**. Remaining warnings:
 
 | Rule | Why |
 |---|---|
 | W002 `vehicle_id` not populated | The Rejseplanen API exposes no vehicle id. |
-| W007 refresh interval > 35 s | Free-key API budget allows about one poll per minute. Goes away with operator access. |
+| W007 refresh interval > 35 s | The free-key budget allows about one poll per minute; operator mode refreshes faster. |
+
+To validate a running instance, save a few snapshots per feed a minute apart
+into one directory per feed type, put the GTFS next to them as `gtfs.zip`,
+and run `scripts/validate.sh validator.jar <dir>` (needs Java 17 and jq).
+
+## Development
 
 ```sh
-go run ./cmd/gtfs-subset gtfs.zip stog.zip 109     # S-tog only (route_type 109)
-# validator lib jar built from source (needs Java 17)
-java -jar gtfs-realtime-validator-lib-1.0.0-SNAPSHOT-withAllDependencies.jar \
-  -gtfs stog.zip -gtfsRealtimePath snapshots/ -sort name
+make test       # unit, end-to-end and simulator tests, no network
+make race       # what CI runs
+make realfeed   # all-modes matcher round-trip on the real GTFS (no API calls)
+make live       # one real API call (RP_ACCESS_ID, RP_LIVE_STOP)
 ```
-
-## Status / open questions
-
-- [x] Live API JSON shape confirmed 2026-10-08 (captured in
-      `internal/rejseplanen/testdata/departureboard_live_20261008.json`).
-- [x] API stop ids: `stopExtId` is `8600626`, GTFS has `000008600626`;
-      leading-zero normalization matches them without aliases.
-- [x] Matcher round-trip on real GTFS: 1782/1782 S-tog hub departures on 2026-10-08
-- [x] Live match rate, 10 min at København H + Nørreport: 1345/1345 departures matched, 0 errors.
-- [x] Cancellations confirmed live (`"cancelled": true`, no `prognosisType`); both
-      cancelled Bx trains in a 3-hour board matched their GTFS trips.
-- [x] GTFS-RT validator: 0 errors on live snapshots (see Validation).
-- [ ] Ask Rejseplanen whether their HAFAS backend can already export GTFS-RT.
 
 ## Data and licence
 
-Timetable data © Rejseplanen, CC BY 4.0. Live data is from the Rejseplanen
+Timetable data © Rejseplanen, CC BY 4.0. Realtime data from the Rejseplanen
 Labs API under its terms. Code is Apache-2.0.

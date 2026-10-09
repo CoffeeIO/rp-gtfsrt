@@ -19,4 +19,4 @@ jobs:
         env:
           RP_GTFS_ZIP: ${{ github.workspace }}/gtfs.zip
           TZ: Europe/Copenhagen
-        run: RP_DATE=$(date +%F) go test ./internal/matcher -run RealFeed -v -count=1
+        run: RP_DATE=$(date +%F) go test ./internal/matcher -run Real -v -count=1 -timeout 20m

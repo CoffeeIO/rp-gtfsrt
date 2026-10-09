@@ -21,4 +21,4 @@ docker:
 
 # Replays a day's scheduled hub departures through the matcher. No API calls.
 realfeed:
-	RP_GTFS_ZIP=$${RP_GTFS_ZIP:-data/gtfs.zip} RP_DATE=$${RP_DATE:-$$(date +%F)} go test ./internal/matcher -run RealFeed -v -count=1
+	RP_GTFS_ZIP=$${RP_GTFS_ZIP:-data/gtfs.zip} RP_DATE=$${RP_DATE:-$$(date +%F)} go test ./internal/matcher -run Real -v -count=1 -timeout 20m

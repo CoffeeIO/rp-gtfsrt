@@ -1,0 +1,78 @@
+# rp-gtfsrt with Docker Compose. Pick a profile:
+#
+#   docker compose --profile demo up        free Labs key, S-tog hubs, budget mode
+#   docker compose --profile operator up    every trip in Denmark, rate mode
+#   docker compose --profile simulator up   no key: simulated API, whole country
+#
+# Put RP_ACCESS_ID=... in a .env file next to this one. The image is pulled
+# from GHCR; to use local changes, first run:
+#   docker build -t ghcr.io/coffeeio/rp-gtfsrt:latest .
+# Feeds are served on http://localhost:8080/gtfs-rt/{trip-updates,vehicle-positions,alerts}.
+
+x-bridge: &bridge
+  image: ghcr.io/coffeeio/rp-gtfsrt:latest
+  pull_policy: missing
+  restart: unless-stopped
+  ports: ["8080:8080"]
+  volumes: ["rpdata:/data"]
+
+services:
+  demo:
+    <<: *bridge
+    profiles: [demo]
+    environment:
+      RP_ACCESS_ID: ${RP_ACCESS_ID:?set RP_ACCESS_ID in .env}
+      RP_ROUTES: A,B,Bx,C,E,F,H
+      RP_STOPS: "8600626,8600646"          # København H, Nørreport
+      RP_PRODUCTS: "16"                    # S-tog
+      RP_MODE: budget
+      RP_MONTHLY_BUDGET: "20000"
+      RP_JOURNEYS: cancelled
+
+  # Discovery stations for the whole country, recomputed at start-up.
+  plan:
+    <<: *bridge
+    profiles: [operator, simulator]
+    restart: "no"
+    ports: []
+    command: ["plan-stops", "-cache-dir", "/data", "-out", "/data/stops.txt"]
+
+  operator:
+    <<: *bridge
+    profiles: [operator]
+    depends_on:
+      plan: {condition: service_completed_successfully}
+    environment:
+      RP_ACCESS_ID: ${RP_ACCESS_ID:?set RP_ACCESS_ID in .env}
+      RP_STOPS_FILE: /data/stops.txt
+      RP_MODE: rate
+      RP_RATE: "50"
+      RP_CONCURRENCY: "16"
+      RP_JOURNEYS: all
+      RP_BOARD_INTERVAL: 30m
+      RP_JOURNEY_INTERVAL: 1m
+
+  simulated-api:
+    <<: *bridge
+    profiles: [simulator]
+    ports: ["8090:8090"]
+    command: ["simulate", "-cache-dir", "/data"]
+
+  simulated-bridge:
+    <<: *bridge
+    profiles: [simulator]
+    depends_on:
+      plan: {condition: service_completed_successfully}
+      simulated-api: {condition: service_started}
+    environment:
+      RP_ACCESS_ID: simulated
+      RP_API_BASE: http://simulated-api:8090/api
+      RP_STOPS_FILE: /data/stops.txt
+      RP_MODE: rate
+      RP_RATE: "50"
+      RP_CONCURRENCY: "16"
+      RP_JOURNEYS: all
+      RP_BOARD_INTERVAL: 30m
+
+volumes:
+  rpdata:

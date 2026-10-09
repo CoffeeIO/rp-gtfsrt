@@ -1,0 +1,50 @@
+name: conformance
+# Validates the feeds with MobilityData's GTFS-Realtime validator: the test
+# fixture on every push, and the real Rejseplanen S-tog timetable nightly.
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "30 4 * * *"
+  workflow_dispatch:
+env:
+  VALIDATOR_COMMIT: 7041fa3fcaf674bf730e17325c179d329cdff6f2
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Cache validator
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: validator.jar
+          key: gtfs-rt-validator-${{ env.VALIDATOR_COMMIT }}
+      - name: Build validator
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          git clone -q https://github.com/MobilityData/gtfs-realtime-validator.git v
+          git -C v checkout -q "$VALIDATOR_COMMIT"
+          (cd v/gtfs-realtime-validator-lib && mvn -q -DskipTests package)
+          cp v/gtfs-realtime-validator-lib/target/*-withAllDependencies.jar validator.jar
+      - name: Fixture snapshots
+        run: RP_SNAPSHOT_DIR=$PWD/snap-fixture go test ./internal/e2e -run Conformance -count=1 -v
+      - name: Validate fixture snapshots
+        run: scripts/validate.sh validator.jar snap-fixture
+      - name: Real S-tog snapshots
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          TZ: Europe/Copenhagen
+        run: |
+          curl -fsSL --retry 3 -o gtfs.zip https://www.rejseplanen.info/labs/GTFS.zip
+          go run ./cmd/gtfs-subset gtfs.zip stog.zip 109
+          RP_GTFS_ZIP=$PWD/stog.zip RP_SNAPSHOT_START=$(date +%Y-%m-%dT08:00:00%:z) \
+            RP_SNAPSHOT_DIR=$PWD/snap-stog go test ./internal/e2e -run Conformance -count=1 -v
+          scripts/validate.sh validator.jar snap-stog

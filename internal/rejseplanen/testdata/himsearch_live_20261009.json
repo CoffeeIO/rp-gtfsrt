@@ -1,0 +1,1148 @@
+{
+  "Message": [
+    {
+      "edge": [
+        {
+          "iconCoordinate": {
+            "lon": 12.488165,
+            "lat": 55.717003
+          }
+        }
+      ],
+      "event": [
+        {
+          "sStop": {
+            "name": "Terrasserne (Ruten)",
+            "id": "A=1@O=Terrasserne (Ruten)@X=12488165@Y=55717003@U=86@L=2027@",
+            "extId": "2027",
+            "lon": 12.488165,
+            "lat": 55.717003,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Terrasserne (Ruten)",
+            "id": "A=1@O=Terrasserne (Ruten)@X=12488165@Y=55717003@U=86@L=2027@",
+            "extId": "2027",
+            "lon": 12.488165,
+            "lat": 55.717003,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Tingbjerg Skole (Ruten)",
+            "id": "A=1@O=Tingbjerg Skole (Ruten)@X=12484534@Y=55717668@U=86@L=2028@",
+            "extId": "2028",
+            "lon": 12.484534,
+            "lat": 55.717668,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Tingbjerg Skole (Ruten)",
+            "id": "A=1@O=Tingbjerg Skole (Ruten)@X=12484534@Y=55717668@U=86@L=2028@",
+            "extId": "2028",
+            "lon": 12.484534,
+            "lat": 55.717668,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Tingbjerg Kirke (Ruten)",
+            "id": "A=1@O=Tingbjerg Kirke (Ruten)@X=12480848@Y=55718558@U=86@L=2029@",
+            "extId": "2029",
+            "lon": 12.480848,
+            "lat": 55.718558,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Tingbjerg Kirke (Ruten)",
+            "id": "A=1@O=Tingbjerg Kirke (Ruten)@X=12480848@Y=55718558@U=86@L=2029@",
+            "extId": "2029",
+            "lon": 12.480848,
+            "lat": 55.718558,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Arkaderne (Langhusvej)",
+            "id": "A=1@O=Arkaderne (Langhusvej)@X=12481324@Y=55721668@U=86@L=2030@",
+            "extId": "2030",
+            "lon": 12.481324,
+            "lat": 55.721668,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Arkaderne (Langhusvej)",
+            "id": "A=1@O=Arkaderne (Langhusvej)@X=12481324@Y=55721668@U=86@L=2030@",
+            "extId": "2030",
+            "lon": 12.481324,
+            "lat": 55.721668,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Fuglegavl (Gavlhusvej)",
+            "id": "A=1@O=Fuglegavl (Gavlhusvej)@X=12486062@Y=55722315@U=86@L=2031@",
+            "extId": "2031",
+            "lon": 12.486062,
+            "lat": 55.722315,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Fuglegavl (Gavlhusvej)",
+            "id": "A=1@O=Fuglegavl (Gavlhusvej)@X=12486062@Y=55722315@U=86@L=2031@",
+            "extId": "2031",
+            "lon": 12.486062,
+            "lat": 55.722315,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Fuglegavl (Gavlhusvej)",
+            "id": "A=1@O=Fuglegavl (Gavlhusvej)@X=12485388@Y=55722441@U=86@L=2001@",
+            "extId": "2001",
+            "lon": 12.485388,
+            "lat": 55.722441,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Fuglegavl (Gavlhusvej)",
+            "id": "A=1@O=Fuglegavl (Gavlhusvej)@X=12485388@Y=55722441@U=86@L=2001@",
+            "extId": "2001",
+            "lon": 12.485388,
+            "lat": 55.722441,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Arkaderne (Langhusvej)",
+            "id": "A=1@O=Arkaderne (Langhusvej)@X=12481441@Y=55721794@U=86@L=2002@",
+            "extId": "2002",
+            "lon": 12.481441,
+            "lat": 55.721794,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Arkaderne (Langhusvej)",
+            "id": "A=1@O=Arkaderne (Langhusvej)@X=12481441@Y=55721794@U=86@L=2002@",
+            "extId": "2002",
+            "lon": 12.481441,
+            "lat": 55.721794,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Tingbjerg Kirke (Ruten)",
+            "id": "A=1@O=Tingbjerg Kirke (Ruten)@X=12480075@Y=55718755@U=86@L=2003@",
+            "extId": "2003",
+            "lon": 12.480075,
+            "lat": 55.718755,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Tingbjerg Kirke (Ruten)",
+            "id": "A=1@O=Tingbjerg Kirke (Ruten)@X=12480075@Y=55718755@U=86@L=2003@",
+            "extId": "2003",
+            "lon": 12.480075,
+            "lat": 55.718755,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Tingbjerg Skole (Ruten)",
+            "id": "A=1@O=Tingbjerg Skole (Ruten)@X=12485576@Y=55717416@U=86@L=2004@",
+            "extId": "2004",
+            "lon": 12.485576,
+            "lat": 55.717416,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Tingbjerg Skole (Ruten)",
+            "id": "A=1@O=Tingbjerg Skole (Ruten)@X=12485576@Y=55717416@U=86@L=2004@",
+            "extId": "2004",
+            "lon": 12.485576,
+            "lat": 55.717416,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:48:00",
+          "sDate": "2024-12-16",
+          "eTime": "05:00:00",
+          "eDate": "2027-09-30",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        }
+      ],
+      "affectedStops": {
+        "StopLocation": [
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "E",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "E"
+                },
+                {
+                  "value": "1002",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1002"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 2",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 2"
+                },
+                {
+                  "value": "2",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "2"
+                }
+              ]
+            },
+            "id": "A=1@O=Terrasserne (Ruten)@X=12488165@Y=55717003@U=86@L=2027@",
+            "extId": "2027",
+            "name": "Terrasserne (Ruten)",
+            "lon": 12.488165,
+            "lat": 55.717003,
+            "products": 0
+          },
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "E",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "E"
+                },
+                {
+                  "value": "1002",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1002"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 2",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 2"
+                },
+                {
+                  "value": "2",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "2"
+                }
+              ]
+            },
+            "id": "A=1@O=Terrasserne (Ruten)@X=12488165@Y=55717003@U=86@L=2027@",
+            "extId": "2027",
+            "name": "Terrasserne (Ruten)",
+            "lon": 12.488165,
+            "lat": 55.717003,
+            "products": 0
+          }
+        ]
+      },
+      "validFromStop": {
+        "name": "Terrasserne (Ruten)",
+        "id": "A=1@O=Terrasserne (Ruten)@X=12488165@Y=55717003@U=86@L=2027@",
+        "extId": "2027",
+        "lon": 12.488165,
+        "lat": 55.717003,
+        "minimumChangeDuration": "PT4M"
+      },
+      "validToStop": {
+        "name": "Terrasserne (Ruten)",
+        "id": "A=1@O=Terrasserne (Ruten)@X=12488165@Y=55717003@U=86@L=2027@",
+        "extId": "2027",
+        "lon": 12.488165,
+        "lat": 55.717003,
+        "minimumChangeDuration": "PT4M"
+      },
+      "channel": [
+        {
+          "name": "external_interface"
+        },
+        {
+          "name": "timetable"
+        }
+      ],
+      "messageCategory": [
+        {
+          "id": 0,
+          "name": "generel information"
+        }
+      ],
+      "id": "ROI_HIM_FREETEXT_6010000540557729",
+      "act": true,
+      "head": "Linje 2A kører en anden rute ved Tingbjerg",
+      "text": "Linje 2A kører ikke den normale rute ad Ruten - Langhusvej - Gavlhusvej. Det gælder i begge retninger.  Det betyder, at bussen ikke betjener stoppestederne Fuglegavl, Arkaderne Tingbjerg Kirke, Tingbjerg Skole samt Terrasserne i retning mod Gavlhusvej.   Linje 2A kører i stedet ad Terrasserne.   På den omlagte rute opsættes der et midlertidigt stop som erstatning for stoppet Terrasserne. Det står cirka 100 meter fremme ad Terrasserne.   Ændringen skyldes anlægsarbejde og gælder fra 14. aug. kl 5:00 til september 2027.",
+      "company": "Movia H",
+      "category": "0",
+      "priority": 5,
+      "products": 32,
+      "icon": "him_gen_info",
+      "sTime": "10:48:25",
+      "sDate": "2024-12-16",
+      "eTime": "05:00:00",
+      "eDate": "2027-09-30"
+    },
+    {
+      "edge": [
+        {
+          "iconCoordinate": {
+            "lon": 12.511321,
+            "lat": 55.735925
+          }
+        }
+      ],
+      "event": [
+        {
+          "sStop": {
+            "name": "Søborg Skole (Søborg Hovedgade)",
+            "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+            "extId": "7113",
+            "lon": 12.511321,
+            "lat": 55.735925,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Søborg Skole (Søborg Hovedgade)",
+            "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+            "extId": "7113",
+            "lon": 12.511321,
+            "lat": 55.735925,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:00:00",
+          "sDate": "2025-07-10",
+          "eTime": "15:00:00",
+          "eDate": "2027-06-01",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        },
+        {
+          "sStop": {
+            "name": "Søborg Skole (Søborg Hovedgade)",
+            "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+            "extId": "7113",
+            "lon": 12.511321,
+            "lat": 55.735925,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Søborg Skole (Søborg Hovedgade)",
+            "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+            "extId": "7113",
+            "lon": 12.511321,
+            "lat": 55.735925,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "06:30:00",
+          "sDate": "2025-07-10",
+          "eTime": "15:00:00",
+          "eDate": "2027-06-01",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        }
+      ],
+      "affectedStops": {
+        "StopLocation": [
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "DG",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "DG"
+                },
+                {
+                  "value": "1031",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1031"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 31",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 31"
+                },
+                {
+                  "value": "31",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "31"
+                }
+              ]
+            },
+            "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+            "extId": "7113",
+            "name": "Søborg Skole (Søborg Hovedgade)",
+            "lon": 12.511321,
+            "lat": 55.735925,
+            "products": 32
+          },
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "DG",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "DG"
+                },
+                {
+                  "value": "1031",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1031"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 31",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 31"
+                },
+                {
+                  "value": "31",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "31"
+                }
+              ]
+            },
+            "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+            "extId": "7113",
+            "name": "Søborg Skole (Søborg Hovedgade)",
+            "lon": 12.511321,
+            "lat": 55.735925,
+            "products": 32
+          }
+        ]
+      },
+      "validFromStop": {
+        "name": "Søborg Skole (Søborg Hovedgade)",
+        "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+        "extId": "7113",
+        "lon": 12.511321,
+        "lat": 55.735925,
+        "minimumChangeDuration": "PT4M"
+      },
+      "validToStop": {
+        "name": "Søborg Skole (Søborg Hovedgade)",
+        "id": "A=1@O=Søborg Skole (Søborg Hovedgade)@X=12511321@Y=55735925@U=86@L=7113@",
+        "extId": "7113",
+        "lon": 12.511321,
+        "lat": 55.735925,
+        "minimumChangeDuration": "PT4M"
+      },
+      "channel": [
+        {
+          "name": "external_interface"
+        },
+        {
+          "name": "timetable"
+        }
+      ],
+      "messageCategory": [
+        {
+          "id": 0,
+          "name": "generel information"
+        }
+      ],
+      "id": "ROI_HIM_FREETEXT_6010000569593410",
+      "act": true,
+      "head": "Stoppestedet Søborg Skole for linje 6A mod Nørreport St. er flyttet",
+      "text": "Stoppestedet Søborg Skole for linje 6A mod Nørreport St. er flyttet ca. 150 meter tilbage i forhold til kørselsretningen fra 10. jul. kl 10:00 2025 til 01. jun. kl 15:00. 2027  Ændringen skyldes vejarbejde.",
+      "company": "Movia H",
+      "category": "0",
+      "priority": 5,
+      "products": 32,
+      "icon": "him_gen_info",
+      "sTime": "06:30:52",
+      "sDate": "2025-07-10",
+      "eTime": "15:00:00",
+      "eDate": "2027-06-01"
+    },
+    {
+      "edge": [
+        {
+          "iconCoordinate": {
+            "lon": 12.473351,
+            "lat": 55.716643
+          }
+        }
+      ],
+      "event": [
+        {
+          "sStop": {
+            "name": "Bystævneparken nord (Bystævneparken)",
+            "id": "A=1@O=Bystævneparken nord (Bystævneparken)@X=12473351@Y=55716643@U=86@L=52271@",
+            "extId": "52271",
+            "lon": 12.473351,
+            "lat": 55.716643,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Bystævneparken nord (Bystævneparken)",
+            "id": "A=1@O=Bystævneparken nord (Bystævneparken)@X=12473351@Y=55716643@U=86@L=52271@",
+            "extId": "52271",
+            "lon": 12.473351,
+            "lat": 55.716643,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "04:02:00",
+          "sDate": "2025-09-06",
+          "eTime": "12:00:00",
+          "eDate": "2026-12-04",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        }
+      ],
+      "affectedStops": {
+        "StopLocation": [
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "E",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "E"
+                },
+                {
+                  "value": "1002",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1002"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 2",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 2"
+                },
+                {
+                  "value": "2",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "2"
+                }
+              ]
+            },
+            "id": "A=1@O=Bystævneparken nord (Bystævneparken)@X=12473351@Y=55716643@U=86@L=52271@",
+            "extId": "52271",
+            "name": "Bystævneparken nord (Bystævneparken)",
+            "lon": 12.473351,
+            "lat": 55.716643,
+            "products": 32
+          },
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "E",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "E"
+                },
+                {
+                  "value": "1002",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1002"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 2",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 2"
+                },
+                {
+                  "value": "2",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "2"
+                }
+              ]
+            },
+            "id": "A=1@O=Bystævneparken nord (Bystævneparken)@X=12473351@Y=55716643@U=86@L=52271@",
+            "extId": "52271",
+            "name": "Bystævneparken nord (Bystævneparken)",
+            "lon": 12.473351,
+            "lat": 55.716643,
+            "products": 32
+          }
+        ]
+      },
+      "validFromStop": {
+        "name": "Bystævneparken nord (Bystævneparken)",
+        "id": "A=1@O=Bystævneparken nord (Bystævneparken)@X=12473351@Y=55716643@U=86@L=52271@",
+        "extId": "52271",
+        "lon": 12.473351,
+        "lat": 55.716643,
+        "minimumChangeDuration": "PT4M"
+      },
+      "validToStop": {
+        "name": "Bystævneparken nord (Bystævneparken)",
+        "id": "A=1@O=Bystævneparken nord (Bystævneparken)@X=12473351@Y=55716643@U=86@L=52271@",
+        "extId": "52271",
+        "lon": 12.473351,
+        "lat": 55.716643,
+        "minimumChangeDuration": "PT4M"
+      },
+      "channel": [
+        {
+          "name": "external_interface"
+        },
+        {
+          "name": "timetable"
+        }
+      ],
+      "messageCategory": [
+        {
+          "id": 0,
+          "name": "generel information"
+        }
+      ],
+      "id": "ROI_HIM_FREETEXT_6010000578751159",
+      "act": true,
+      "head": "Stoppestedet Bystævneparken nord for linje 22 mod Husum Torv er flyttet",
+      "text": "Stoppestedet Bystævneparken nord for linje 22 mod Husum Torv er flyttet ca. 100 meter tilbage fra 28. jun. kl 10:00 til 04. dec. kl 12:00.  Ændringen skyldes vejarbejde.",
+      "company": "Movia H",
+      "category": "0",
+      "priority": 5,
+      "products": 32,
+      "icon": "him_gen_info",
+      "sTime": "04:02:39",
+      "sDate": "2025-09-06",
+      "eTime": "12:00:00",
+      "eDate": "2026-12-04"
+    },
+    {
+      "edge": [
+        {
+          "iconCoordinate": {
+            "lon": 12.473809,
+            "lat": 55.889038
+          }
+        }
+      ],
+      "event": [
+        {
+          "sStop": {
+            "name": "Transformatorstationen (Agiltevej)",
+            "id": "A=1@O=Transformatorstationen (Agiltevej)@X=12473809@Y=55889038@U=86@L=2852@",
+            "extId": "2852",
+            "lon": 12.473809,
+            "lat": 55.889038,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Transformatorstationen (Agiltevej)",
+            "id": "A=1@O=Transformatorstationen (Agiltevej)@X=12473809@Y=55889038@U=86@L=2852@",
+            "extId": "2852",
+            "lon": 12.473809,
+            "lat": 55.889038,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "10:34:00",
+          "sDate": "2025-09-13",
+          "eTime": "15:00:00",
+          "eDate": "2027-12-31",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        }
+      ],
+      "affectedStops": {
+        "StopLocation": [
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "I",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "I"
+                },
+                {
+                  "value": "1070",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1070"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 70",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 70"
+                },
+                {
+                  "value": "70",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "70"
+                }
+              ]
+            },
+            "id": "A=1@O=Transformatorstationen (Agiltevej)@X=12473809@Y=55889038@U=86@L=2852@",
+            "extId": "2852",
+            "name": "Transformatorstationen (Agiltevej)",
+            "lon": 12.473809,
+            "lat": 55.889038,
+            "products": 32
+          },
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "I",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "I"
+                },
+                {
+                  "value": "1070",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1070"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 70",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 70"
+                },
+                {
+                  "value": "70",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "70"
+                }
+              ]
+            },
+            "id": "A=1@O=Transformatorstationen (Agiltevej)@X=12473809@Y=55889038@U=86@L=2852@",
+            "extId": "2852",
+            "name": "Transformatorstationen (Agiltevej)",
+            "lon": 12.473809,
+            "lat": 55.889038,
+            "products": 32
+          }
+        ]
+      },
+      "validFromStop": {
+        "name": "Transformatorstationen (Agiltevej)",
+        "id": "A=1@O=Transformatorstationen (Agiltevej)@X=12473809@Y=55889038@U=86@L=2852@",
+        "extId": "2852",
+        "lon": 12.473809,
+        "lat": 55.889038,
+        "minimumChangeDuration": "PT4M"
+      },
+      "validToStop": {
+        "name": "Transformatorstationen (Agiltevej)",
+        "id": "A=1@O=Transformatorstationen (Agiltevej)@X=12473809@Y=55889038@U=86@L=2852@",
+        "extId": "2852",
+        "lon": 12.473809,
+        "lat": 55.889038,
+        "minimumChangeDuration": "PT4M"
+      },
+      "channel": [
+        {
+          "name": "external_interface"
+        },
+        {
+          "name": "timetable"
+        }
+      ],
+      "messageCategory": [
+        {
+          "id": 0,
+          "name": "generel information"
+        }
+      ],
+      "id": "ROI_HIM_FREETEXT_6010000579946082",
+      "act": true,
+      "head": "Stoppestedet Transformatorstationen for linje 330R mod Allerød, Rønneholtparken er flyttet",
+      "text": "Stoppestedet Transformatorstationen for linje 330R mod Allerød, Rønneholtparken er flyttet ca. 60 meter tilbage og står ud for stoppestedet i modsatte retning fra 12. sep. 2025 kl 9:00 til 31. dec. 2027 kl 15:00.  Ændringen skyldes arbejde ved stoppestedet.",
+      "company": "Movia H",
+      "category": "0",
+      "priority": 5,
+      "products": 32,
+      "icon": "him_gen_info",
+      "sTime": "10:34:59",
+      "sDate": "2025-09-13",
+      "eTime": "15:00:00",
+      "eDate": "2027-12-31"
+    },
+    {
+      "edge": [
+        {
+          "iconCoordinate": {
+            "lon": 12.162702,
+            "lat": 55.7839
+          }
+        }
+      ],
+      "event": [
+        {
+          "sStop": {
+            "name": "Kærgårdsvej (Ring Nord)",
+            "id": "A=1@O=Kærgårdsvej (Ring Nord)@X=12162702@Y=55783900@U=86@L=10161@",
+            "extId": "10161",
+            "lon": 12.162702,
+            "lat": 55.7839,
+            "minimumChangeDuration": "PT4M"
+          },
+          "eStop": {
+            "name": "Kærgårdsvej (Ring Nord)",
+            "id": "A=1@O=Kærgårdsvej (Ring Nord)@X=12162702@Y=55783900@U=86@L=10161@",
+            "extId": "10161",
+            "lon": 12.162702,
+            "lat": 55.7839,
+            "minimumChangeDuration": "PT4M"
+          },
+          "validityDays": {
+            "sDaysB": "0000000000000000000000"
+          },
+          "sTime": "08:00:00",
+          "sDate": "2026-01-16",
+          "eTime": "05:00:00",
+          "eDate": "2028-01-28",
+          "sDaily": "00d00:00:00",
+          "eDaily": "00d23:59:00",
+          "direction": 1
+        }
+      ],
+      "affectedStops": {
+        "StopLocation": [
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "ABCH",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "ABCH"
+                },
+                {
+                  "value": "1085",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1085"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 85",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 85"
+                },
+                {
+                  "value": "85",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "85"
+                }
+              ]
+            },
+            "id": "A=1@O=Kærgårdsvej (Ring Nord)@X=12162702@Y=55783900@U=86@L=10161@",
+            "extId": "10161",
+            "name": "Kærgårdsvej (Ring Nord)",
+            "lon": 12.162702,
+            "lat": 55.7839,
+            "products": 128
+          },
+          {
+            "LocationNotes": {
+              "LocationNote": [
+                {
+                  "value": "ABCH",
+                  "key": "OZ",
+                  "type": "I",
+                  "txtN": "ABCH"
+                },
+                {
+                  "value": "1085",
+                  "key": "TN",
+                  "type": "I",
+                  "txtN": "1085"
+                },
+                {
+                  "value": "TH",
+                  "key": "TP",
+                  "type": "I",
+                  "txtN": "TH"
+                },
+                {
+                  "value": "DOT 85",
+                  "key": "TR",
+                  "type": "I",
+                  "txtN": "DOT 85"
+                },
+                {
+                  "value": "85",
+                  "key": "TW",
+                  "type": "I",
+                  "txtN": "85"
+                }
+              ]
+            },
+            "id": "A=1@O=Kærgårdsvej (Ring Nord)@X=12162702@Y=55783900@U=86@L=10161@",
+            "extId": "10161",
+            "name": "Kærgårdsvej (Ring Nord)",
+            "lon": 12.162702,
+            "lat": 55.7839,
+            "products": 128
+          }
+        ]
+      },
+      "validFromStop": {
+        "name": "Kærgårdsvej (Ring Nord)",
+        "id": "A=1@O=Kærgårdsvej (Ring Nord)@X=12162702@Y=55783900@U=86@L=10161@",
+        "extId": "10161",
+        "lon": 12.162702,
+        "lat": 55.7839,
+        "minimumChangeDuration": "PT4M"
+      },
+      "validToStop": {
+        "name": "Kærgårdsvej (Ring Nord)",
+        "id": "A=1@O=Kærgårdsvej (Ring Nord)@X=12162702@Y=55783900@U=86@L=10161@",
+        "extId": "10161",
+        "lon": 12.162702,
+        "lat": 55.7839,
+        "minimumChangeDuration": "PT4M"
+      },
+      "channel": [
+        {
+          "name": "external_interface"
+        },
+        {
+          "name": "timetable"
+        }
+      ],
+      "messageCategory": [
+        {
+          "id": 0,
+          "name": "generel information"
+        }
+      ],
+      "id": "ROI_HIM_FREETEXT_6010000600625268",
+      "act": true,
+      "head": "Stoppestedet Kærgårdsvej for linje 91N mod Greve St. er flyttet",
+      "text": "Stoppestedet Kærgårdsvej for linje 91N mod Greve St. er flyttet ca. 30 meter frem fra 16. jan. kl 8:00 til 28. jan. kl 5:00.  Ændringen skyldes byggeprojekt.",
+      "company": "Movia H",
+      "category": "0",
+      "priority": 5,
+      "products": 128,
+      "icon": "him_gen_info",
+      "sTime": "08:00:00",
+      "sDate": "2026-01-16",
+      "eTime": "05:00:00",
+      "eDate": "2028-01-28"
+    },
+    {
+      "event": [
+        {
+          "sTime": "05:00:00",
+          "sDate": "2026-10-04",
+          "eTime": "05:00:00",
+          "eDate": "2026-10-04"
+        }
+      ],
+      "channel": [
+        {
+          "name": "external_interface"
+        },
+        {
+          "name": "timetable"
+        }
+      ],
+      "messageCategory": [
+        {
+          "id": 0,
+          "name": "generel information"
+        }
+      ],
+      "id": "ROI_HIM_FREETEXT_6010000602159598",
+      "act": true,
+      "head": "Linje 72 betjener ikke stoppestedet Nordens Plads",
+      "text": "Linje 72 betjener ikke stoppestedet  Nordens Plads fra 02. feb. kl 7:00 til 04. feb. kl 5:00 - 2028.  Du kan i stedet tage bussen fra linje 7As stoppested Domus Vista ude på Roskildevej.  Ændringen skyldes byggeri.",
+      "company": "Movia H",
+      "category": "0",
+      "priority": 5,
+      "products": 0,
+      "icon": "him_gen_info",
+      "sTime": "05:00:00",
+      "sDate": "2026-01-30",
+      "eTime": "05:00:00",
+      "eDate": "2028-02-04"
+    }
+  ]
+}
