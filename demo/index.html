@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rp-gtfsrt demo</title>
+<meta name="description" content="A recorded day of Copenhagen S-tog realtime data, turned into GTFS-Realtime by rp-gtfsrt and replayed in the browser.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">rp-gtfsrt · demo</p>
+    <h1>Denmark's live train times, in the format Google Maps reads</h1>
+    <p class="lede">Google Maps shows Danish trains on their timetable only. This page replays one
+      recorded day of S-tog data from Rejseplanen, converted by
+      <a href="https://github.com/CoffeeIO/rp-gtfsrt">rp-gtfsrt</a> into GTFS-Realtime, the feed
+      format Google, Apple and other journey planners take in. The left column is what a
+      timetable-only app shows, the right column what it would show with the feed.</p>
+  </div>
+</header>
+
+<section class="player wrap" aria-label="Replay controls">
+  <button id="play" class="btn" type="button" aria-label="Play">▶</button>
+  <div class="clock"><span id="clock">--:--</span><small id="day"></small></div>
+  <input id="slider" type="range" min="0" max="1" step="60" value="0" aria-label="Time of day">
+  <div class="speed" role="group" aria-label="Replay speed">
+    <button type="button" data-speed="1">1×</button>
+    <button type="button" data-speed="30" class="on">30×</button>
+    <button type="button" data-speed="120">120×</button>
+  </div>
+</section>
+
+<main class="wrap grid">
+  <section class="card board-card">
+    <div class="card-head">
+      <h2>Departures</h2>
+      <select id="station" aria-label="Station"></select>
+    </div>
+    <table class="board">
+      <thead>
+        <tr><th>Line</th><th>To</th><th class="num">Timetable<br><small>what Maps shows today</small></th><th class="num">With the feed</th></tr>
+      </thead>
+      <tbody id="board"></tbody>
+    </table>
+    <p id="board-empty" class="muted" hidden>No departures in the next hour at this point of the recording.</p>
+  </section>
+
+  <section class="card map-card">
+    <div class="card-head">
+      <h2>Trains right now</h2>
+      <div class="legend"><span class="dot ok"></span>on time <span class="dot late"></span>2–5 min <span class="dot very"></span>5+ min</div>
+    </div>
+    <div id="map" role="img" aria-label="Map of S-tog lines with trains placed by their live times"></div>
+  </section>
+
+  <section class="card stats-card">
+    <h2>At this moment</h2>
+    <dl class="stats">
+      <div><dt>Trips in the feed</dt><dd id="s-trips">–</dd></div>
+      <div><dt>Delayed 2+ min</dt><dd id="s-late">–</dd></div>
+      <div><dt>Largest delay</dt><dd id="s-max">–</dd></div>
+      <div><dt>Cancelled</dt><dd id="s-cancel">–</dd></div>
+    </dl>
+    <h3>Delayed trains through the day</h3>
+    <svg id="timeline" class="timeline" viewBox="0 0 600 90" preserveAspectRatio="none" role="img" aria-label="Number of trains delayed two minutes or more, per minute, across the recorded day"></svg>
+    <p class="muted small">Click the chart to jump to that time.</p>
+  </section>
+
+  <section class="card day-card">
+    <h2>The whole day</h2>
+    <dl class="stats" id="day-stats"></dl>
+    <div id="alerts"></div>
+  </section>
+
+  <section class="card about-card">
+    <h2>What you are looking at</h2>
+    <ul>
+      <li><strong>Real data, recorded.</strong> The bridge polled Rejseplanen's API with a free Labs key
+        (about one call every 20 seconds, København H and Nørreport boards plus journey details) and
+        saved its three feeds once a minute. This page replays those files; nothing here calls
+        Rejseplanen.</li>
+      <li><strong>Matched to Rejseplanen's own GTFS.</strong> Every trip in the feed carries the trip_id
+        from Rejseplanen's static timetable, the same file Google already uses for Denmark. Train positions
+        on the map are placed from the live stop times.</li>
+      <li><strong>S-tog only, on purpose.</strong> A free key allows a few hundred calls an hour. The same
+        software covers every train, metro, light rail and bus in Denmark with operator access; it has
+        been tested on all 44,319 trips of a day.</li>
+      <li><strong>Valid GTFS-Realtime.</strong> MobilityData's validator reports 0 errors on the bridge's feeds, in CI on every change and nightly on live S-tog data.</li>
+    </ul>
+    <p class="downloads" id="downloads"></p>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>Data: Rejseplanen (Rejsekort &amp; Rejseplan A/S), CC BY 4.0. Map © OpenStreetMap contributors.
+    Code: <a href="https://github.com/CoffeeIO/rp-gtfsrt">github.com/CoffeeIO/rp-gtfsrt</a>, Apache 2.0.
+    Not affiliated with Rejseplanen or Google.</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="app.js"></script>
+</body>
+</html>

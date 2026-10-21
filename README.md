@@ -4,6 +4,8 @@
 [![conformance](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/conformance.yml/badge.svg)](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/conformance.yml)
 [![real-gtfs](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/realfeed.yml/badge.svg)](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/realfeed.yml)
 
+**[Demo](https://coffeeio.github.io/rp-gtfsrt/)**: a recorded day of S-tog data replayed in the browser.
+
 Open-source bridge that turns Rejseplanen's realtime data into
 **GTFS-Realtime** (TripUpdates, VehiclePositions and Alerts) for every
 train, metro, light rail and bus in Denmark, so Google Maps, Apple Maps and
@@ -81,6 +83,16 @@ Without Docker:
 ```sh
 go run ./cmd/rp-gtfsrt plan-stops -out stops.txt          # discovery stations
 RP_ACCESS_ID=... go run ./cmd/rp-gtfsrt serve -stops-file stops.txt -mode rate -rate 50 -journeys all
+```
+
+## Demo
+
+`demo/` is a static page (GitHub Pages) that replays recorded feeds. To refresh it,
+record a day (`serve` plus one snapshot of each feed a minute, named
+`<20060102T150405>.<feed>.pb`), then:
+
+```sh
+go run ./cmd/demo-export -gtfs data/gtfs.zip -snapshots rec/20261022 -out demo/data/day.json -samples 08:00
 ```
 
 ## Documentation
