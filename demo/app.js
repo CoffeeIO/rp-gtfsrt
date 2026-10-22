@@ -53,6 +53,7 @@ function start(json) {
 function stateAt(trip, t) {
   const states = trip.st;
   if (!states.length || states[0][0] > t || t > trip.l + 120) return null;
+  if (inGap(t)) return null;
   let lo = 0, hi = states.length - 1;
   while (lo < hi) {
     const mid = (lo + hi + 1) >> 1;
@@ -95,6 +96,9 @@ const stopLatLng = (index) => [data.stops[index][1], data.stops[index][2]];
 function render() {
   el("clock").textContent = fmtTime.format(new Date(now * 1000));
   el("slider").value = now;
+  const gap = gaps().find(([from, to]) => now > from + 60 && now < to);
+  el("gap").hidden = !gap;
+  if (gap) el("gap").textContent = `No recording ${fmtTime.format(new Date(gap[0] * 1000))}–${fmtTime.format(new Date(gap[1] * 1000))}: trains are missing here, not cancelled.`;
   renderBoard();
   renderMap();
   renderStats();
@@ -234,7 +238,8 @@ function drawTimeline() {
   const peak = Math.max(1, ...buckets.map((bucket) => bucket[1]));
   const width = 600, height = 74, barWidth = width / buckets.length;
   timelineScale = (t) => ((t - first) / Math.max(1, last - first)) * width;
-  let svgContent = buckets.map(([t, late], i) =>
+  let svgContent = gaps().map(([from, to]) =>
+    `<rect class="gap" x="${timelineScale(from).toFixed(1)}" y="0" width="${Math.max(1, timelineScale(to) - timelineScale(from)).toFixed(1)}" height="${height}"><title>No data ${fmtTime.format(new Date(from * 1000))}–${fmtTime.format(new Date(to * 1000))}</title></rect>`).join("") + buckets.map(([t, late], i) =>
     `<rect class="bar" x="${(i * barWidth).toFixed(1)}" y="${(height - (late / peak) * height).toFixed(1)}" width="${Math.max(1, barWidth - 0.5).toFixed(1)}" height="${((late / peak) * height).toFixed(1)}"><title>${fmtTime.format(new Date(t * 1000))}: ${late} delayed</title></rect>`).join("");
   for (let hour = 0; hour < 24; hour += 3) {
     const t = first + secondsUntil(first, hour, 0);
@@ -247,6 +252,20 @@ function drawTimeline() {
     now = Math.round(first + ((event.clientX - box.left) / box.width) * (last - first));
     render();
   });
+}
+
+const inGap = (t) => gaps().some(([from, to]) => t > from + 120 && t < to);
+
+// Stretches of more than three minutes without a snapshot (the recording
+// machine was asleep or offline).
+let gapCache;
+function gaps() {
+  if (gapCache) return gapCache;
+  const out = [];
+  for (let i = 1; i < data.frames.length; i++) {
+    if (data.frames[i][0] - data.frames[i - 1][0] > 180) out.push([data.frames[i - 1][0], data.frames[i][0]]);
+  }
+  return (gapCache = out);
 }
 
 function moveCursor() {

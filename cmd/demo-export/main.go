@@ -7,7 +7,8 @@
 // stop times of every trip seen in the feed, a timeline of each trip's
 // realtime state (only when it changes), and per-minute feed statistics.
 //
-//	go run ./cmd/demo-export -gtfs data/gtfs.zip -snapshots rec/snapshots/20261022 -out demo/data/day.json
+//	go run ./cmd/demo-export -gtfs data/gtfs.zip -snapshots rec/20261022,rec/20261023 \
+//		-from 2026-10-22T05:00 -until 2026-10-23T00:30 -out demo/data/day.json
 package main
 
 import (
@@ -66,7 +67,9 @@ type alert struct {
 
 func main() {
 	gtfsPath := flag.String("gtfs", "data/gtfs.zip", "static GTFS zip the feed was matched against")
-	dir := flag.String("snapshots", "", "directory with recorded snapshots for one day")
+	dir := flag.String("snapshots", "", "directory with recorded snapshots (comma-separated for several)")
+	from := flag.String("from", "", "first local time to include, 2006-01-02T15:04 (default: all)")
+	until := flag.String("until", "", "last local time to include, 2006-01-02T15:04 (default: all)")
 	out := flag.String("out", "demo/data/day.json", "output JSON")
 	routes := flag.String("routes", "A,B,Bx,C,E,F,H", "route_short_names to load")
 	stations := flag.String("stations", "København H,Nørreport St.", "board stations shown first")
@@ -85,7 +88,7 @@ func main() {
 	sched, err := gtfs.LoadZip(*gtfsPath, filter, loc)
 	check(err)
 
-	timestamps := snapshotTimes(*dir)
+	timestamps := snapshotTimes(strings.Split(*dir, ","), window(*from, loc, "00000101T000000"), window(*until, loc, "99991231T235959"))
 	if len(timestamps) == 0 {
 		check(fmt.Errorf("no snapshots in %s", *dir))
 	}
@@ -116,9 +119,9 @@ func main() {
 		if first.IsZero() {
 			first = at
 		}
-		tu := readFeed(filepath.Join(*dir, ts+".trip-updates.pb"))
-		vp := readFeed(filepath.Join(*dir, ts+".vehicle-positions.pb"))
-		al := readFeed(filepath.Join(*dir, ts+".alerts.pb"))
+		tu := readFeed(filepath.Join(dirOf[ts], ts+".trip-updates.pb"))
+		vp := readFeed(filepath.Join(dirOf[ts], ts+".vehicle-positions.pb"))
+		al := readFeed(filepath.Join(dirOf[ts], ts+".alerts.pb"))
 		if tu == nil {
 			continue
 		}
@@ -189,7 +192,7 @@ func main() {
 				alerts[entity.GetId()] = na
 			}
 		}
-		result.Frames = append(result.Frames, []int64{at.Unix(), int64(len(tu.GetEntity())), cancelled, vehicles, activeAlerts, apiCalls(filepath.Join(*dir, ts+".healthz.json"))})
+		result.Frames = append(result.Frames, []int64{at.Unix(), int64(len(tu.GetEntity())), cancelled, vehicles, activeAlerts, apiCalls(filepath.Join(dirOf[ts], ts+".healthz.json"))})
 	}
 	result.Date = first.Format("2006-01-02")
 
@@ -217,7 +220,7 @@ func main() {
 		ts := nearest(timestamps, first.Format("20060102")+"T"+strings.ReplaceAll(*samples, ":", "")+"00")
 		for _, feed := range []string{"trip-updates", "vehicle-positions", "alerts"} {
 			name := "sample-" + feed + ".pb"
-			data, err := os.ReadFile(filepath.Join(*dir, ts+"."+feed+".pb"))
+			data, err := os.ReadFile(filepath.Join(dirOf[ts], ts+"."+feed+".pb"))
 			check(err)
 			check(os.WriteFile(filepath.Join(outDir, name), data, 0o644))
 			result.Samples[feed] = name
@@ -285,15 +288,35 @@ func (tr *trip) state(update *rt.TripUpdate) []int64 {
 	return state
 }
 
-func snapshotTimes(dir string) []string {
-	matches, err := filepath.Glob(filepath.Join(dir, "*.trip-updates.pb"))
-	check(err)
+// dirOf maps a snapshot timestamp to the directory holding it.
+var dirOf = map[string]string{}
+
+func snapshotTimes(dirs []string, from, until string) []string {
 	var out []string
-	for _, m := range matches {
-		out = append(out, strings.TrimSuffix(filepath.Base(m), ".trip-updates.pb"))
+	for _, dir := range dirs {
+		matches, err := filepath.Glob(filepath.Join(dir, "*.trip-updates.pb"))
+		check(err)
+		for _, m := range matches {
+			ts := strings.TrimSuffix(filepath.Base(m), ".trip-updates.pb")
+			if ts < from || ts > until {
+				continue
+			}
+			dirOf[ts] = dir
+			out = append(out, ts)
+		}
 	}
 	sort.Strings(out)
 	return out
+}
+
+// window turns a 2006-01-02T15:04 flag into a snapshot timestamp bound.
+func window(value string, loc *time.Location, fallback string) string {
+	if value == "" {
+		return fallback
+	}
+	t, err := time.ParseInLocation("2006-01-02T15:04", value, loc)
+	check(err)
+	return t.Format("20060102T150405")
 }
 
 func nearest(sorted []string, want string) string {

@@ -140,3 +140,5 @@ select { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid 
   :root:not([data-theme="light"]) .tiles { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.4); }
 }
 :root[data-theme="dark"] .tiles { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.4); }
+.timeline .gap { fill: var(--muted); opacity: .18; }
+.gap-note { margin: 12px auto 0; color: var(--late); font-size: 14px; font-weight: 600; }
