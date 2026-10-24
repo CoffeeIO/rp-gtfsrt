@@ -72,6 +72,10 @@ type Task struct {
 type taskState struct {
 	next     time.Time
 	failures int
+	// badRef is the journey ref that last failed permanently. A board can
+	// hand out a new ref for the same journey (refs encode the timetable
+	// version), which ends the long backoff.
+	badRef string
 }
 
 type Scheduler struct {
@@ -202,6 +206,9 @@ func (s *Scheduler) Next(now time.Time) (*Task, time.Time) {
 				continue
 			}
 			jt := Task{kind: kindJourney, key: t.Key, ref: t.Ref, due: s.due(kindJourney, t.Key, now)}
+			if st := s.state[stateKey(kindJourney, t.Key)]; st != nil && st.badRef != "" && st.badRef != t.Ref {
+				jt.due = now
+			}
 			if t.Cancelled && !t.HasJourney {
 				jt.priority = 10 * time.Minute
 			}
@@ -247,6 +254,7 @@ func (s *Scheduler) schedule(t *Task, start time.Time, err error) {
 	}
 	if err == nil {
 		st.failures = 0
+		st.badRef = ""
 		st.next = start.Add(s.interval(t.kind))
 		return
 	}
@@ -257,6 +265,7 @@ func (s *Scheduler) schedule(t *Task, start time.Time, err error) {
 	}
 	if !rejseplanen.IsTemporary(err) && t.kind == kindJourney {
 		backoff = time.Hour // e.g. unknown journey; don't hammer it
+		st.badRef = t.ref
 	}
 	st.next = start.Add(max(backoff, s.interval(t.kind)))
 }
@@ -272,6 +281,7 @@ func (s *Scheduler) claim(t *Task, now time.Time) {
 		s.state[key] = st
 	}
 	st.next = now.Add(5 * time.Minute)
+	st.badRef = ""
 }
 
 // Execute runs one task synchronously.
@@ -327,7 +337,11 @@ func (s *Scheduler) Execute(ctx context.Context, t *Task) error {
 		s.Metrics.Inc("rpgtfsrt_api_calls_total", "Rejseplanen API calls by kind and status.", "kind", t.kind.String(), "status", status)
 	}
 	if err != nil {
-		s.log().Warn("api call failed", "kind", t.kind, "key", t.key, "err", err)
+		args := []any{"kind", t.kind, "key", t.key, "err", err}
+		if t.kind == kindJourney && !rejseplanen.IsTemporary(err) {
+			args = append(args, "ref", t.ref) // tells a stale ref from a bad request
+		}
+		s.log().Warn("api call failed", args...)
 	}
 	return err
 }

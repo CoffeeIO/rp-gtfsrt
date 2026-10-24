@@ -243,6 +243,36 @@ func TestPermanentJourneyErrorBacksOffLong(t *testing.T) {
 	}
 }
 
+func TestNewRefEndsPermanentJourneyBackoff(t *testing.T) {
+	now := at(8, 0)
+	const ref2 = "2|#ZI#1#TA#1#DA#81026#" // same journey, newer timetable version
+	api := &fakeAPI{
+		boards:   map[string][]rejseplanen.Departure{"s1": {departure("s1", at(8, 12), false)}},
+		journeys: map[string]rejseplanen.Journey{ref2: {Ref: ref2}},
+		errs:     map[string]error{"journey:" + ref1: &rejseplanen.HTTPError{Status: 400}},
+	}
+	s := newScheduler(api, Config{Stops: []string{"s1"}, BoardInterval: time.Minute, JourneyMode: JourneysAll, JourneyInterval: 2 * time.Minute, JourneyLookahead: time.Hour}, &now)
+	runDue(t, s)
+	now = now.Add(time.Minute)
+	if ran := runDue(t, s); contains(ran, "journey:1@81026") {
+		t.Fatalf("same ref should stay backed off: %v", ran)
+	}
+	d := departure("s1", at(8, 12), false)
+	d.JourneyRef = ref2
+	api.boards["s1"] = []rejseplanen.Departure{d}
+	now = now.Add(time.Minute)
+	if ran := runDue(t, s); !contains(ran, "journey:1@81026") {
+		t.Fatalf("new ref should be fetched at once: %v", ran)
+	}
+	if c := api.Calls(); c[len(c)-1] != "journey:"+ref2 {
+		t.Fatalf("calls = %v", c)
+	}
+	now = now.Add(time.Minute)
+	if ran := runDue(t, s); contains(ran, "journey:1@81026") {
+		t.Fatalf("after success the normal interval applies: %v", ran)
+	}
+}
+
 func TestAssumeOnTime(t *testing.T) {
 	now := at(8, 0)
 	api := &fakeAPI{boards: map[string][]rejseplanen.Departure{"s1": {departure("s1", at(8, 12), false)}}}
