@@ -88,6 +88,13 @@ func (c *Client) get(ctx context.Context, endpoint string, params url.Values) (b
 	}
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		// *url.Error carries the request URL; keep the accessId out of logs.
+		var ue *url.Error
+		if errors.As(err, &ue) {
+			params.Set("accessId", "redacted")
+			u.RawQuery = params.Encode()
+			ue.URL = u.String()
+		}
 		return nil, fmt.Errorf("rejseplanen: %s: %w", endpoint, err)
 	}
 	defer resp.Body.Close()

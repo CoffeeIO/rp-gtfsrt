@@ -93,6 +93,18 @@ func TestClientContextCancelled(t *testing.T) {
 	}
 }
 
+func TestClientTransportErrorHidesAccessID(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(200 * time.Millisecond)
+	}))
+	defer srv.Close()
+	c := &rejseplanen.Client{BaseURL: srv.URL, AccessID: "secret", HTTP: &http.Client{Timeout: 50 * time.Millisecond}}
+	_, err := c.DepartureBoard(context.Background(), "1")
+	if err == nil || strings.Contains(err.Error(), "secret") || !strings.Contains(err.Error(), "accessId=redacted") {
+		t.Fatalf("err = %v", err)
+	}
+}
+
 func TestClientBadBaseURL(t *testing.T) {
 	c := &rejseplanen.Client{BaseURL: "://nope", AccessID: "k"}
 	if _, err := c.DepartureBoard(context.Background(), "1"); err == nil || !strings.Contains(err.Error(), "base url") {
