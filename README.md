@@ -100,6 +100,7 @@ go run ./cmd/demo-export -gtfs data/gtfs.zip -snapshots rec/20261022 -out demo/d
 * [Operator guide](docs/operator-guide.md): deployment, configuration, sizing, monitoring
 * [Publishing to Google Maps and others](docs/google-transit.md)
 * [Architecture and data notes](docs/architecture.md): matching, API behaviour, limitations
+* [Serving GTFS-Realtime natively](docs/native-implementation.md): field mapping and checks for an implementation inside Rejseplanen
 
 ## Validation
 
