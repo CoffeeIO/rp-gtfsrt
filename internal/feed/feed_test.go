@@ -171,6 +171,23 @@ func TestJourneyDetailBecomesFullTripUpdate(t *testing.T) {
 	}
 }
 
+func TestStopTimesThatDoNotIncreaseAreLeftOut(t *testing.T) {
+	s := schedule(t, gtfstest.Fixture)
+	store := feed.NewStore()
+	j := journeyA1()
+	// Nørreport predicted at 8:13, before København H's departure at 8:14.
+	j.Stops[2].RealtimeArrival, j.Stops[2].RealtimeDeparture = tp(at(8, 8, 13)), tp(at(8, 8, 13))
+	store.ObserveJourney(j, at(8, 8, 0))
+	tu := entity(t, store.Render(s, at(8, 8, 1)).TripUpdates, "200@81026").GetTripUpdate()
+	var stops []string
+	for _, stu := range tu.StopTimeUpdate {
+		stops = append(stops, stu.GetStopId())
+	}
+	if strings.Join(stops, ",") != "8600601,8600626-1,8600669" {
+		t.Fatalf("stops = %v", stops)
+	}
+}
+
 func TestJourneyCancellations(t *testing.T) {
 	s := schedule(t, gtfstest.Fixture)
 

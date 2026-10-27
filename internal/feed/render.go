@@ -194,8 +194,20 @@ func (e *entry) tripUpdate(sched *gtfs.Schedule, res matcher.Result) (*rt.TripUp
 		positions = append(positions, p)
 	}
 	sort.Ints(positions)
+	var prev time.Time // last event time of the previous published stop
 	for _, p := range positions {
 		u := updates[p]
+		if !u.skipped && (u.arrival != nil || u.departure != nil) {
+			// Times must strictly increase along the trip (validator E022).
+			// Predictions merged from separate updates can disagree; leave
+			// out the stop that contradicts the one before rather than
+			// publish both.
+			first, last := u.span()
+			if !prev.IsZero() && !first.After(prev) {
+				continue
+			}
+			prev = last
+		}
 		stu := &rt.TripUpdate_StopTimeUpdate{
 			StopSequence: proto.Uint32(uint32(sts[p].Sequence)),
 			StopId:       proto.String(sched.Stops[sts[p].Stop].ID),
@@ -221,6 +233,17 @@ func (e *entry) tripUpdate(sched *gtfs.Schedule, res matcher.Result) (*rt.TripUp
 		return nil, maxDelay
 	}
 	return tu, maxDelay
+}
+
+// span returns the earliest and latest event time of u.
+func (u *stopUpdate) span() (time.Time, time.Time) {
+	switch {
+	case u.arrival == nil:
+		return u.departure.at, u.departure.at
+	case u.departure == nil:
+		return u.arrival.at, u.arrival.at
+	}
+	return u.arrival.at, u.departure.at
 }
 
 func stopTimeEvent(e *event) *rt.TripUpdate_StopTimeEvent {
