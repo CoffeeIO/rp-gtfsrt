@@ -124,6 +124,7 @@ func TestDecodeBadXML(t *testing.T) {
 type fakeStore struct {
 	mu       sync.Mutex
 	observed []string
+	last     rejseplanen.Journey
 	pruned   int
 }
 
@@ -131,6 +132,7 @@ func (f *fakeStore) ObserveJourney(j rejseplanen.Journey, _ time.Time) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.observed = append(f.observed, j.Ref)
+	f.last = j
 }
 
 func (f *fakeStore) Prune(time.Time) int {
@@ -178,5 +180,50 @@ func TestPollerHTTPError(t *testing.T) {
 	}
 	if st := p.Stats(); st.Errors != 1 || st.LastError == "" {
 		t.Fatalf("stats = %+v", st)
+	}
+}
+
+func TestSubscriberMergesMessagesPerJourney(t *testing.T) {
+	store := &fakeStore{}
+	s := &siri.Subscriber{Store: store, Now: func() time.Time { return time.Date(2026, 10, 25, 9, 0, 0, 0, time.UTC) }}
+	msg := func(recorded string, calls ...string) []byte {
+		return []byte(doc(journey("j1", recorded, "", calls...)))
+	}
+	stop1 := call("1", "2026-10-25T09:05:00+01:00", "2026-10-25T09:06:00+01:00", "")
+	stop2 := call("2", "2026-10-25T09:10:00+01:00", "2026-10-25T09:12:00+01:00", "")
+	stop2late := call("2", "2026-10-25T09:10:00+01:00", "2026-10-25T09:11:00+01:00", "")
+	for _, m := range [][]byte{
+		msg("2026-10-25T08:01:00Z", stop1),
+		msg("2026-10-25T08:03:00Z", stop2),
+		msg("2026-10-25T08:02:00Z", stop2late), // older than the stop 2 update before it
+	} {
+		if err := s.Handle(m); err != nil {
+			t.Fatal(err)
+		}
+	}
+	got := store.last
+	if len(got.Stops) != 2 || got.Stops[0].StopID != "1" || got.Stops[1].StopID != "2" {
+		t.Fatalf("stops = %+v", got.Stops)
+	}
+	if d := got.Stops[1].RealtimeDeparture.Sub(*got.Stops[1].ScheduledDeparture); d != 2*time.Minute {
+		t.Fatalf("a late message must not overwrite newer data, delay %v", d)
+	}
+	if st := s.Stats(); st.Messages != 3 || st.Updates != 3 || st.Tracked != 1 {
+		t.Fatalf("stats = %+v", st)
+	}
+	if err := s.Handle([]byte("<Siri><EstimatedVehicleJourney>")); err == nil {
+		t.Fatal("expected decode error")
+	}
+}
+
+func TestParseURL(t *testing.T) {
+	ns, topic, sub, err := siri.ParseURL("amqps://sb-x.servicebus.windows.net/t-distribution-801/0f7e-1")
+	if err != nil || ns != "sb-x.servicebus.windows.net" || topic != "t-distribution-801" || sub != "0f7e-1" {
+		t.Fatalf("got %q %q %q %v", ns, topic, sub, err)
+	}
+	for _, bad := range []string{"https://x/a/b", "amqps://x/a", "amqps:///a/b", "amqps://x/a/b/c"} {
+		if _, _, _, err := siri.ParseURL(bad); err == nil {
+			t.Errorf("%s: expected error", bad)
+		}
 	}
 }

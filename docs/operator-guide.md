@@ -36,25 +36,41 @@ a few seconds). The compose profile does it at every start.
 ### From SIRI-ET instead of the API
 
 Rejseplanen also publishes its realtime data as SIRI-ET on the national
-access point (Dataudveksleren), CC BY 4.0, with no call budget. The bridge
-can read a SIRI-ET estimated timetable document instead of polling the API:
+access point (Dataudveksleren), CC BY 4.0, with no call budget: one dataset
+per operator (783, 785–790, 799–801, 808), delivered as Azure Service Bus
+topic subscriptions over AMQP. To receive them:
+
+1. Log in at Dataudveksleren with MitID Erhverv (a CVR number is needed).
+2. Under Profil › Servicekonti, create a service account. Its password is
+   shown once and cannot be recovered.
+3. On each SIRI dataset, attach the service account (Tilknyt), then open
+   Abonner på begivenhed data › Abonner for its tenant id and AMQP URL.
 
 ```sh
-rp-gtfsrt serve -source siri -siri-url https://.../estimated-timetable.xml
+export RP_DU_TENANT_ID=... RP_DU_CLIENT_ID=... RP_DU_CLIENT_SECRET=...
+export RP_SIRI_AMQP_URLS=amqps://<namespace>/t-distribution-785/<subscription>,...
+rp-gtfsrt serve -source siri
 ```
 
-Each journey is matched to a GTFS trip the same way as a journeyDetail
-response, by its stops and scheduled times; SIRI journey ids are not GTFS
-trip_ids. With `-access-id`, the API is still used for traffic alerts only.
-SIRI-ET has no vehicle positions, so that feed stays empty.
+Each message carries only the stops of one journey that changed; the bridge
+merges the messages of a journey (newest wins) and matches the result to a
+GTFS trip the same way as a journeyDetail response, by its stops and
+scheduled times. SIRI journey ids are not GTFS trip_ids. Messages are
+received once and deleted. With `-access-id`, the API is still used for
+traffic alerts only. SIRI-ET has no vehicle positions, so that feed stays
+empty.
 
-Measured on 2026-10-25 against the public mirror of the access point
-streams (`http://gtfs.spline.de/siri/danmark/estimated-timetable.xml`,
-892 journeys): 848 matched, 3 ambiguous, 41 without a match (24 of them
-carried no stops). Every match agreed with the SIRI line or train number.
-The mirror carries only some operators and repeats each stop once per
-update; the bridge keeps the last. For full coverage, subscribe to the
-SIRI datasets on Dataudveksleren directly.
+Measured live on 2026-10-27 with all eleven subscriptions: after two
+minutes 1,178 journeys, 1,168 matched, 4 ambiguous, 6 without a match;
+trip updates for every operator including S-tog. Snapshots passed the
+GTFS-RT validator with 0 errors (only W002, no vehicle ids).
+
+`-siri-url` instead reads one SIRI-ET estimated timetable document over
+HTTP, for example the public mirror
+`http://gtfs.spline.de/siri/danmark/estimated-timetable.xml`, which carries
+only some operators. On a saved national delivery (2026-10-25, 892
+journeys) 848 matched, and every match agreed with the SIRI line or train
+number.
 
 ### Try it without a key
 
@@ -83,7 +99,9 @@ Every flag can be set as an environment variable: `-journey-interval` →
 | Flag | Default | Meaning |
 |---|---|---|
 | `-source` | `api` | realtime source: `api` or `siri` |
-| `-siri-url`, `-siri-interval` | , `1m` | siri source: SIRI-ET document URL and fetch interval |
+| `-siri-amqp-urls` | | siri source: Dataudveksleren AMQP subscription URLs |
+| `-du-tenant-id`, `-du-client-id`, `-du-client-secret` | | siri AMQP: service account credentials |
+| `-siri-url`, `-siri-interval` | , `1m` | siri source: SIRI-ET document URL and fetch interval (instead of AMQP) |
 | `-access-id` | | Rejseplanen API key (required with `-source api`) |
 | `-api-base` | `https://www.rejseplanen.dk/api` | API root |
 | `-stops`, `-stops-file` | | discovery stations (from `plan-stops`) |

@@ -122,7 +122,9 @@ func TestServeSIRISource(t *testing.T) {
 		t.Fatalf("config = %+v", c)
 	}
 	for args, want := range map[string]string{
-		"-source siri":  "missing -siri-url",
+		"-source siri": "needs one of -siri-url or -siri-amqp-urls",
+		"-source siri -siri-url http://x -siri-amqp-urls amqps://x/t/s": "needs one of",
+		"-source siri -siri-amqp-urls amqps://x/t/s":                    "needs -du-tenant-id",
 		"-source other": "bad -source",
 	} {
 		if _, err := parseServe(strings.Fields(args)); err == nil || !strings.Contains(err.Error(), want) {

@@ -105,16 +105,40 @@ func (r rawJourney) update() (Update, bool) {
 	for _, id := range order {
 		j.Stops = append(j.Stops, latest[id].stop())
 	}
-	// Order is optional; without it the planned times give the sequence.
-	sort.SliceStable(j.Stops, func(a, b int) bool {
-		sa, sb := j.Stops[a], j.Stops[b]
+	sortStops(j.Stops)
+	return Update{Journey: j, RecordedAt: parseTime(r.RecordedAtTime)}, true
+}
+
+// Merge combines an earlier state of a journey with a newer update of it.
+// Event messages carry only the stops that changed, so stops missing from
+// next keep their earlier values; stops in both take next's.
+func Merge(prev, next rejseplanen.Journey) rejseplanen.Journey {
+	out := next
+	out.Stops = append([]rejseplanen.JourneyStop(nil), next.Stops...)
+	have := map[string]bool{}
+	for _, s := range next.Stops {
+		have[s.StopID] = true
+	}
+	for _, s := range prev.Stops {
+		if !have[s.StopID] {
+			out.Stops = append(out.Stops, s)
+		}
+	}
+	sortStops(out.Stops)
+	return out
+}
+
+// sortStops orders stops by Order when every stop has one, otherwise by
+// planned time.
+func sortStops(stops []rejseplanen.JourneyStop) {
+	sort.SliceStable(stops, func(a, b int) bool {
+		sa, sb := stops[a], stops[b]
 		if sa.Index > 0 && sb.Index > 0 {
 			return sa.Index < sb.Index
 		}
 		ta, tb := plannedTime(sa), plannedTime(sb)
 		return ta != nil && tb != nil && ta.Before(*tb)
 	})
-	return Update{Journey: j, RecordedAt: parseTime(r.RecordedAtTime)}, true
 }
 
 func (c rawCall) stop() rejseplanen.JourneyStop {

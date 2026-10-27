@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+
 	"github.com/CoffeeIO/rp-gtfsrt/internal/budget"
 	"github.com/CoffeeIO/rp-gtfsrt/internal/feed"
 	"github.com/CoffeeIO/rp-gtfsrt/internal/gtfs"
@@ -26,7 +28,8 @@ import (
 type serveConfig struct {
 	common
 	addr, baseURL, accessID, stopList, stopsFile, mode, journeys string
-	source, siriURL                                              string
+	source, siriURL, siriAMQP                                    string
+	duTenant, duClient, duSecret                                 string
 	products, window, maxJourneys, limit, activeFrom, activeTo   int
 	concurrency, maxAlerts                                       int
 	rate                                                         float64
@@ -43,6 +46,10 @@ func parseServe(args []string) (*serveConfig, error) {
 	fs.StringVar(&c.source, "source", env("source", "api"), "realtime source: api (Rejseplanen API) or siri (SIRI-ET document)")
 	fs.StringVar(&c.siriURL, "siri-url", env("siri-url", ""), "siri source: URL of a SIRI-ET estimated timetable document")
 	fs.DurationVar(&c.siriInterval, "siri-interval", envDuration("siri-interval", time.Minute), "siri source: fetch interval")
+	fs.StringVar(&c.siriAMQP, "siri-amqp-urls", env("siri-amqp-urls", ""), "siri source: comma-separated Dataudveksleren AMQP subscription URLs (instead of -siri-url)")
+	fs.StringVar(&c.duTenant, "du-tenant-id", env("du-tenant-id", ""), "siri AMQP: Dataudveksleren tenant id")
+	fs.StringVar(&c.duClient, "du-client-id", env("du-client-id", ""), "siri AMQP: service account client id")
+	fs.StringVar(&c.duSecret, "du-client-secret", env("du-client-secret", ""), "siri AMQP: service account password (prefer RP_DU_CLIENT_SECRET)")
 	fs.StringVar(&c.baseURL, "api-base", env("api-base", "https://www.rejseplanen.dk/api"), "Rejseplanen API base URL")
 	fs.StringVar(&c.accessID, "access-id", env("access-id", ""), "Rejseplanen Labs accessId (or RP_ACCESS_ID)")
 	fs.StringVar(&c.stopList, "stops", env("stops", ""), "comma-separated API stop ids whose departure boards are polled")
@@ -76,8 +83,11 @@ func parseServe(args []string) (*serveConfig, error) {
 			return nil, errors.New("missing -access-id / RP_ACCESS_ID")
 		}
 	case "siri":
-		if c.siriURL == "" {
-			return nil, errors.New("missing -siri-url / RP_SIRI_URL")
+		switch {
+		case (c.siriURL == "") == (c.siriAMQP == ""):
+			return nil, errors.New("-source siri needs one of -siri-url or -siri-amqp-urls")
+		case c.siriAMQP != "" && (c.duTenant == "" || c.duClient == "" || c.duSecret == ""):
+			return nil, errors.New("-siri-amqp-urls needs -du-tenant-id, -du-client-id and -du-client-secret")
 		}
 	default:
 		return nil, fmt.Errorf("bad -source %q (want api or siri)", c.source)
@@ -196,9 +206,19 @@ func serve(args []string) error {
 	store := feed.NewStore()
 	alerts := &feed.AlertStore{}
 	var poller *siri.Poller
+	var subscriber *siri.Subscriber
 	journeys := scheduler.JourneyMode(c.journeys)
-	if c.source == "siri" {
+	switch {
+	case c.siriURL != "":
 		poller = &siri.Poller{URL: c.siriURL, Interval: c.siriInterval, Store: store, Metrics: reg, Logger: logger}
+	case c.siriAMQP != "":
+		cred, err := azidentity.NewClientSecretCredential(c.duTenant, c.duClient, c.duSecret, nil)
+		if err != nil {
+			return err
+		}
+		subscriber = &siri.Subscriber{URLs: splitList(c.siriAMQP), Credential: cred, Store: store, Metrics: reg, Logger: logger}
+	}
+	if c.source == "siri" {
 		// The API, if a key is given, only fetches traffic alerts.
 		journeys = scheduler.JourneysOff
 	}
@@ -218,6 +238,9 @@ func serve(args []string) error {
 			if poller != nil {
 				st["siri"] = poller.Stats()
 			}
+			if subscriber != nil {
+				st["siri"] = subscriber.Stats()
+			}
 			if b != nil {
 				st["budget_used"], st["budget_limit"] = b.Used(time.Now()), b.Limit
 			}
@@ -227,6 +250,14 @@ func serve(args []string) error {
 	srv := &http.Server{Addr: c.addr, ReadHeaderTimeout: 10 * time.Second, Handler: server.Handler()}
 	if poller != nil {
 		go poller.Run(ctx)
+	}
+	if subscriber != nil {
+		go func() {
+			if err := subscriber.Run(ctx); err != nil {
+				logger.Error("siri subscriber stopped", "err", err)
+				stop()
+			}
+		}()
 	}
 	if useAPI {
 		go sch.Run(ctx)
