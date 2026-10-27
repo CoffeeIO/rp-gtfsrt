@@ -113,6 +113,24 @@ func TestServeDefaults(t *testing.T) {
 	}
 }
 
+func TestServeSIRISource(t *testing.T) {
+	c, err := parseServe([]string{"-source", "siri", "-siri-url", "http://x/et.xml"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.source != "siri" || c.siriInterval != time.Minute {
+		t.Fatalf("config = %+v", c)
+	}
+	for args, want := range map[string]string{
+		"-source siri":  "missing -siri-url",
+		"-source other": "bad -source",
+	} {
+		if _, err := parseServe(strings.Fields(args)); err == nil || !strings.Contains(err.Error(), want) {
+			t.Errorf("%s: err = %v, want %q", args, err, want)
+		}
+	}
+}
+
 func TestStopsCommand(t *testing.T) {
 	path := gtfstest.WriteFile(t, gtfstest.Fixture)
 	var out bytes.Buffer

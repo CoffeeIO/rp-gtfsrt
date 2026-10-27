@@ -122,11 +122,21 @@ It fails on any ERROR-level finding and prints the warnings.
 **Google.** Submitting the feeds is described in
 [google-transit.md](google-transit.md).
 
+## Starting from SIRI-ET
+
+Rejseplanen's SIRI-ET streams on the national access point already carry
+the delays and cancellations. `rp-gtfsrt serve -source siri` converts a
+SIRI-ET document to GTFS-Realtime ([operator-guide.md](operator-guide.md#from-siri-et-instead-of-the-api)),
+so the conversion can run on Rejseplanen's own data without the API. A
+native version would add the GTFS `trip_id` to each journey and skip the
+matching.
+
 ## Where to look in the code
 
 | File | What it shows |
 |---|---|
 | `internal/feed/render.go` | Building TripUpdates and VehiclePositions from journeys and board rows. |
+| `internal/siri/` | Reading SIRI-ET into the same journey model. |
 | `internal/feed/alerts.go` | Building Alerts and resolving stop ids. |
 | `internal/rejseplanen/` | Which API fields are read, with real responses in `testdata/`. |
 | `internal/matcher/` | Trip matching; only needed from outside. |

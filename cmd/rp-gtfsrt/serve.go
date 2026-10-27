@@ -20,16 +20,18 @@ import (
 	"github.com/CoffeeIO/rp-gtfsrt/internal/metrics"
 	"github.com/CoffeeIO/rp-gtfsrt/internal/rejseplanen"
 	"github.com/CoffeeIO/rp-gtfsrt/internal/scheduler"
+	"github.com/CoffeeIO/rp-gtfsrt/internal/siri"
 )
 
 type serveConfig struct {
 	common
 	addr, baseURL, accessID, stopList, stopsFile, mode, journeys string
+	source, siriURL                                              string
 	products, window, maxJourneys, limit, activeFrom, activeTo   int
 	concurrency, maxAlerts                                       int
 	rate                                                         float64
 	minInterval, boardInterval, journeyInterval, lookahead       time.Duration
-	alertsInterval, renderInterval, reload                       time.Duration
+	alertsInterval, renderInterval, reload, siriInterval         time.Duration
 	assumeOnTime, verbose                                        bool
 }
 
@@ -38,6 +40,9 @@ func parseServe(args []string) (*serveConfig, error) {
 	c := &serveConfig{}
 	c.register(fs, "")
 	fs.StringVar(&c.addr, "addr", env("addr", ":8080"), "HTTP listen address")
+	fs.StringVar(&c.source, "source", env("source", "api"), "realtime source: api (Rejseplanen API) or siri (SIRI-ET document)")
+	fs.StringVar(&c.siriURL, "siri-url", env("siri-url", ""), "siri source: URL of a SIRI-ET estimated timetable document")
+	fs.DurationVar(&c.siriInterval, "siri-interval", envDuration("siri-interval", time.Minute), "siri source: fetch interval")
 	fs.StringVar(&c.baseURL, "api-base", env("api-base", "https://www.rejseplanen.dk/api"), "Rejseplanen API base URL")
 	fs.StringVar(&c.accessID, "access-id", env("access-id", ""), "Rejseplanen Labs accessId (or RP_ACCESS_ID)")
 	fs.StringVar(&c.stopList, "stops", env("stops", ""), "comma-separated API stop ids whose departure boards are polled")
@@ -65,8 +70,17 @@ func parseServe(args []string) (*serveConfig, error) {
 	if err := fs.Parse(args); err != nil {
 		return nil, err
 	}
-	if c.accessID == "" {
-		return nil, errors.New("missing -access-id / RP_ACCESS_ID")
+	switch c.source {
+	case "api":
+		if c.accessID == "" {
+			return nil, errors.New("missing -access-id / RP_ACCESS_ID")
+		}
+	case "siri":
+		if c.siriURL == "" {
+			return nil, errors.New("missing -siri-url / RP_SIRI_URL")
+		}
+	default:
+		return nil, fmt.Errorf("bad -source %q (want api or siri)", c.source)
 	}
 	switch c.mode {
 	case "budget", "rate":
@@ -101,9 +115,11 @@ func serve(args []string) error {
 	if err != nil {
 		return err
 	}
-	stopList, err := c.stops()
-	if err != nil {
-		return err
+	var stopList []string
+	if c.source == "api" {
+		if stopList, err = c.stops(); err != nil {
+			return err
+		}
 	}
 	loc, err := c.location()
 	if err != nil {
@@ -149,9 +165,11 @@ func serve(args []string) error {
 		}
 	}()
 
+	// With -source siri the API is only used for alerts, and only with a key.
+	useAPI := c.source == "api" || c.accessID != ""
 	var pacer scheduler.Pacer
 	var b *budget.Budget
-	if c.mode == "budget" {
+	if useAPI && c.mode == "budget" {
 		if err := os.MkdirAll(c.cacheDir, 0o755); err != nil {
 			return err
 		}
@@ -177,11 +195,18 @@ func serve(args []string) error {
 	}
 	store := feed.NewStore()
 	alerts := &feed.AlertStore{}
+	var poller *siri.Poller
+	journeys := scheduler.JourneyMode(c.journeys)
+	if c.source == "siri" {
+		poller = &siri.Poller{URL: c.siriURL, Interval: c.siriInterval, Store: store, Metrics: reg, Logger: logger}
+		// The API, if a key is given, only fetches traffic alerts.
+		journeys = scheduler.JourneysOff
+	}
 	sch := &scheduler.Scheduler{
 		API: client, Pacer: pacer, Store: store, Alerts: alerts, Metrics: reg, Logger: logger,
 		Config: scheduler.Config{
 			Stops: stopList, BoardInterval: c.boardInterval,
-			JourneyMode: scheduler.JourneyMode(c.journeys), JourneyInterval: c.journeyInterval,
+			JourneyMode: journeys, JourneyInterval: c.journeyInterval,
 			JourneyLookahead: c.lookahead, AlertsInterval: c.alertsInterval,
 			Concurrency: c.concurrency, AssumeOnTime: c.assumeOnTime,
 		},
@@ -189,7 +214,10 @@ func serve(args []string) error {
 	server := &feed.Server{
 		Store: store, Alerts: alerts, Schedule: current.Load, MaxAge: c.renderInterval, Metrics: reg,
 		Status: func() map[string]any {
-			st := map[string]any{"scheduler": sch.Stats(), "mode": c.mode, "stops": len(stopList)}
+			st := map[string]any{"scheduler": sch.Stats(), "mode": c.mode, "stops": len(stopList), "source": c.source}
+			if poller != nil {
+				st["siri"] = poller.Stats()
+			}
 			if b != nil {
 				st["budget_used"], st["budget_limit"] = b.Used(time.Now()), b.Limit
 			}
@@ -197,14 +225,19 @@ func serve(args []string) error {
 		},
 	}
 	srv := &http.Server{Addr: c.addr, ReadHeaderTimeout: 10 * time.Second, Handler: server.Handler()}
-	go sch.Run(ctx)
+	if poller != nil {
+		go poller.Run(ctx)
+	}
+	if useAPI {
+		go sch.Run(ctx)
+	}
 	go func() {
 		<-ctx.Done()
 		shutdown, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		srv.Shutdown(shutdown)
 	}()
-	logger.Info("serving", "addr", c.addr, "mode", c.mode, "stops", len(stopList), "journeys", c.journeys)
+	logger.Info("serving", "addr", c.addr, "source", c.source, "mode", c.mode, "stops", len(stopList), "journeys", journeys)
 	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}

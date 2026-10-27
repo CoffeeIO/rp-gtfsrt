@@ -33,6 +33,29 @@ Or `docker compose --profile operator up` with `RP_ACCESS_ID` in `.env`.
 Re-run `plan-stops` when the timetable changes significantly (it is cheap:
 a few seconds). The compose profile does it at every start.
 
+### From SIRI-ET instead of the API
+
+Rejseplanen also publishes its realtime data as SIRI-ET on the national
+access point (Dataudveksleren), CC BY 4.0, with no call budget. The bridge
+can read a SIRI-ET estimated timetable document instead of polling the API:
+
+```sh
+rp-gtfsrt serve -source siri -siri-url https://.../estimated-timetable.xml
+```
+
+Each journey is matched to a GTFS trip the same way as a journeyDetail
+response, by its stops and scheduled times; SIRI journey ids are not GTFS
+trip_ids. With `-access-id`, the API is still used for traffic alerts only.
+SIRI-ET has no vehicle positions, so that feed stays empty.
+
+Measured on 2026-10-25 against the public mirror of the access point
+streams (`http://gtfs.spline.de/siri/danmark/estimated-timetable.xml`,
+892 journeys): 848 matched, 3 ambiguous, 41 without a match (24 of them
+carried no stops). Every match agreed with the SIRI line or train number.
+The mirror carries only some operators and repeats each stop once per
+update; the bridge keeps the last. For full coverage, subscribe to the
+SIRI datasets on Dataudveksleren directly.
+
 ### Try it without a key
 
 `docker compose --profile simulator up` runs a simulated Rejseplanen API
@@ -59,7 +82,9 @@ Every flag can be set as an environment variable: `-journey-interval` →
 
 | Flag | Default | Meaning |
 |---|---|---|
-| `-access-id` | | Rejseplanen API key (required) |
+| `-source` | `api` | realtime source: `api` or `siri` |
+| `-siri-url`, `-siri-interval` | , `1m` | siri source: SIRI-ET document URL and fetch interval |
+| `-access-id` | | Rejseplanen API key (required with `-source api`) |
 | `-api-base` | `https://www.rejseplanen.dk/api` | API root |
 | `-stops`, `-stops-file` | | discovery stations (from `plan-stops`) |
 | `-mode` | `budget` | `budget` (monthly cap) or `rate` (calls/second) |
