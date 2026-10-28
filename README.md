@@ -4,9 +4,10 @@
 [![conformance](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/conformance.yml/badge.svg)](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/conformance.yml)
 [![real-gtfs](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/realfeed.yml/badge.svg)](https://github.com/CoffeeIO/rp-gtfsrt/actions/workflows/realfeed.yml)
 
-**[Demo](https://coffeeio.github.io/rp-gtfsrt/)**: a recorded day of S-tog data replayed in the browser.
+**[Demo](https://coffeeio.github.io/rp-gtfsrt/)**: a recorded day of S-tog data replayed in the browser, from Rejseplanen's SIRI streams or its API.
 
-Open-source bridge that turns Rejseplanen's realtime data into
+Open-source bridge that turns Rejseplanen's realtime data (its SIRI-ET
+streams on the national access point, or its API) into
 **GTFS-Realtime** (TripUpdates, VehiclePositions and Alerts) for every
 train, metro, light rail and bus in Denmark, so Google Maps, Apple Maps and
 other journey planners can show real departure times, delays and

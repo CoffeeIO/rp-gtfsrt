@@ -1,5 +1,5 @@
-// Replays a recorded day of rp-gtfsrt feeds (data/day.json, written by
-// cmd/demo-export). Everything is computed from the recorded GTFS-Realtime
+// Replays a recorded day of rp-gtfsrt feeds (data/<source>/day.json, written
+// by cmd/demo-export). Everything is computed from the recorded GTFS-Realtime
 // state of each trip plus its scheduled stop times.
 "use strict";
 
@@ -9,11 +9,26 @@ const TZ = "Europe/Copenhagen";
 const fmtTime = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: TZ });
 const fmtDay = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: TZ });
 
+// The same day recorded from two sources; #src= picks one.
+const SOURCES = {
+  siri: {
+    dir: "data/siri/",
+    how: "The bridge subscribed to Rejseplanen's SIRI-ET realtime streams on Dataudveksleren, the Danish national access point, and saved its three feeds once a minute. This page replays those files; nothing here calls Rejseplanen.",
+    scope: "The recording covers every operator in Denmark; this page shows the S-tog part. SIRI needs no API calls, so nothing limits how much is followed.",
+  },
+  api: {
+    dir: "data/api/",
+    how: "The bridge polled Rejseplanen's API with a free Labs key (about one call every 20 seconds, København H and Nørreport boards plus journey details) and saved its three feeds once a minute. This page replays those files; nothing here calls Rejseplanen.",
+    scope: "A free key allows a few hundred calls an hour, so only trips seen on those two boards are followed. The SIRI source covers every trip.",
+  },
+};
 const el = (id) => document.getElementById(id);
 let data, map, trainLayer, now, playing = false, speed = 30, lastTick = 0;
 const markers = new Map();
+const requested = (location.hash.match(/src=(\w+)/) || [])[1];
+const source = requested in SOURCES ? requested : "siri";
 
-fetch("data/day.json").then((response) => response.json()).then(start).catch((error) => {
+fetch(SOURCES[source].dir + "day.json").then((response) => response.json()).then(start).catch((error) => {
   document.querySelector(".grid").innerHTML = `<p class="card">Could not load the recording: ${error}</p>`;
 });
 
@@ -45,6 +60,18 @@ function start(json) {
       document.querySelectorAll(".speed button").forEach((other) => other.classList.toggle("on", other === button));
     });
   }
+  // Switching source reloads the page at the same time of day.
+  for (const button of document.querySelectorAll(".source button")) {
+    button.classList.toggle("on", button.dataset.source === source);
+    button.setAttribute("aria-pressed", button.dataset.source === source);
+    button.addEventListener("click", () => {
+      if (button.dataset.source === source) return;
+      location.hash = `src=${button.dataset.source}&t=${fmtTime.format(new Date(now * 1000)).replace(":", "")}`;
+      location.reload();
+    });
+  }
+  el("about-how").textContent = SOURCES[source].how;
+  el("about-scope").textContent = SOURCES[source].scope;
   render();
 }
 
@@ -295,14 +322,14 @@ function daySummary() {
     ["Cancelled", cancelled],
     ["Largest delay", maxDelay >= 60 ? `${Math.round(maxDelay / 60)} min <small class="muted">${maxTrip ? maxTrip.r : ""}</small>` : "–"],
     ["Snapshots recorded", data.frames.length.toLocaleString("en")],
-    ["API calls used", calls > 0 ? calls.toLocaleString("en") : "–"],
+    source === "siri" ? ["API calls used", "none"] : ["API calls used", calls > 0 ? calls.toLocaleString("en") : "–"],
   ].map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join("");
 }
 
 function downloads() {
   const samples = data.samples || {};
   const links = ["trip-updates", "vehicle-positions", "alerts"].filter((feed) => samples[feed])
-    .map((feed) => `<a href="data/${samples[feed]}" download>${feed}.pb</a>`);
+    .map((feed) => `<a href="${SOURCES[source].dir}${samples[feed]}" download>${feed}.pb</a>`);
   el("downloads").innerHTML = links.length
     ? `Raw GTFS-Realtime protobuf from ${samples.at ? fmtTime.format(parseStamp(samples.at)) : "the recording"}: ${links.join(" · ")}`
     : "";

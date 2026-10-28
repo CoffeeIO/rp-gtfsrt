@@ -67,9 +67,9 @@ h3 { margin: 20px 0 8px; font-size: 14px; color: var(--muted); font-weight: 600;
 #clock { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .clock small { color: var(--muted); font-size: 12px; }
 #slider { flex: 1; min-width: 60px; accent-color: var(--accent); }
-.speed { display: flex; flex: none; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.speed button { border: 0; background: transparent; color: var(--muted); padding: 6px 10px; cursor: pointer; font: inherit; font-size: 13px; }
-.speed button.on { background: var(--chip); color: var(--ink); font-weight: 600; }
+.speed, .source { display: flex; flex: none; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.speed button, .source button { border: 0; background: transparent; color: var(--muted); padding: 6px 10px; cursor: pointer; font: inherit; font-size: 13px; }
+.speed button.on, .source button.on { background: var(--chip); color: var(--ink); font-weight: 600; }
 
 .grid {
   display: grid; gap: 16px; padding-top: 16px; padding-bottom: 16px;

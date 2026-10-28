@@ -1,7 +1,8 @@
 # Serving GTFS-Realtime natively
 
-For Rejseplanen's developers. rp-gtfsrt builds GTFS-Realtime from outside,
-by polling the public API and matching what it sees to the static GTFS.
+For Rejseplanen's developers. rp-gtfsrt builds GTFS-Realtime from outside:
+from Rejseplanen's SIRI-ET streams on Dataudveksleren, or by polling the
+public API, and in both cases by matching what it sees to the static GTFS.
 Inside Rejseplanen's own systems most of that work falls away. This note
 lists what stays, how each feed field maps to the data, and how to check a
 native endpoint with the same tests the bridge uses.
@@ -124,12 +125,38 @@ It fails on any ERROR-level finding and prints the warnings.
 
 ## Starting from SIRI-ET
 
-Rejseplanen's SIRI-ET streams on the national access point already carry
-the delays and cancellations. `rp-gtfsrt serve -source siri` converts a
-SIRI-ET document to GTFS-Realtime ([operator-guide.md](operator-guide.md#from-siri-et-instead-of-the-api)),
-so the conversion can run on Rejseplanen's own data without the API. A
-native version would add the GTFS `trip_id` to each journey and skip the
-matching.
+Rejseplanen's SIRI-ET datasets on Dataudveksleren already carry the delays
+and cancellations. `rp-gtfsrt serve -source siri` subscribes to all eleven
+and converts them to GTFS-Realtime ([operator-guide.md](operator-guide.md#from-siri-et-instead-of-the-api)).
+A native GTFS-Realtime endpoint could be the same conversion running next
+to the SIRI producer, with the GTFS `trip_id` added to each journey so the
+matching falls away.
+
+| GTFS-RT field | SIRI-ET source | Notes |
+|---|---|---|
+| `trip.trip_id`, `start_date` | `FramedVehicleJourneyRef` (`DataFrameRef`, `DatedVehicleJourneyRef`) | The SIRI ref is not a GTFS `trip_id`; the bridge matches by stops and `Aimed*` times. |
+| `stop_time_update.stop_id` | `StopPointRef` | Same 12-digit ids as the GTFS. |
+| `arrival` / `departure` | `Expected*Time` (or `Actual*Time`) minus `Aimed*Time` | No `Expected*` means no prediction for that stop. |
+| `SKIPPED` | `Cancellation`, `ArrivalStatus`/`DepartureStatus` `cancelled` | |
+| `CANCELED` trip | journey `Cancellation` | |
+| `trip_update.timestamp` | `RecordedAtTime` | |
+
+What the bridge learned from the streams (2026-10-27/28):
+
+* **A message is an update, not a timetable.** It carries one journey's
+  stops that have a new prediction, often the rest of the trip for buses but
+  usually a single stop for S-tog. The bridge merges the messages of a
+  journey, newest first, and keeps them until the trip ends.
+* **Updates start about an hour before departure**, and only when there is
+  something to say; a trip without messages is simply not in the feed.
+* **No `Order` on calls** in the streams seen so far; stops are ordered by
+  their planned times.
+* **Occasional short-lived outliers.** For example one S-tog stop was
+  predicted 39 minutes late for one minute and then back on time.
+* **Agreement with the API.** Recorded side by side for one day, SIRI and
+  the API agreed within one minute on 92.5 % of the stop predictions both
+  had, and within two minutes on 98 %. SIRI covered about 50 % more S-tog
+  trips over the day; the API had data on each trip earlier.
 
 ## Where to look in the code
 

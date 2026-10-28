@@ -31,6 +31,10 @@
     <button type="button" data-speed="30" class="on">30×</button>
     <button type="button" data-speed="120">120×</button>
   </div>
+  <div class="source" role="group" aria-label="Data source">
+    <button type="button" data-source="siri" title="Rejseplanen's SIRI-ET streams on the national access point">SIRI</button>
+    <button type="button" data-source="api" title="Rejseplanen's API with a free key">API</button>
+  </div>
 </section>
 
 <p id="gap" class="wrap gap-note" role="status" hidden></p>
@@ -80,16 +84,12 @@
   <section class="card about-card">
     <h2>What you are looking at</h2>
     <ul>
-      <li><strong>Real data, recorded.</strong> The bridge polled Rejseplanen's API with a free Labs key
-        (about one call every 20 seconds, København H and Nørreport boards plus journey details) and
-        saved its three feeds once a minute. This page replays those files; nothing here calls
-        Rejseplanen.</li>
+      <li><strong>Real data, recorded.</strong> <span id="about-how"></span></li>
       <li><strong>Matched to Rejseplanen's own GTFS.</strong> Every trip in the feed carries the trip_id
         from Rejseplanen's static timetable, the same file Google already uses for Denmark. Train positions
         on the map are placed from the live stop times.</li>
-      <li><strong>S-tog only, on purpose.</strong> A free key allows a few hundred calls an hour. The same
-        software covers every train, metro, light rail and bus in Denmark with operator access; it has
-        been tested on all 44,319 trips of a day.</li>
+      <li><strong>Two sources, one feed.</strong> <span id="about-scope"></span> Switch between them
+        with SIRI / API above.</li>
       <li><strong>Valid GTFS-Realtime.</strong> MobilityData's validator reports 0 errors on the bridge's feeds, in CI on every change and nightly on live S-tog data.</li>
     </ul>
     <p class="downloads" id="downloads"></p>
