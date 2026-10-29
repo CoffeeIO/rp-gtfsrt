@@ -301,24 +301,44 @@ function moveCursor() {
   el("cursor").setAttribute("x2", x);
 }
 
+// The largest delay a trip showed for at least two minutes, so a prediction
+// that jumps for a single snapshot does not count. States are stored only on
+// change; each lasts until the next one or until the trip leaves the feed.
+function heldDelay(trip, lastFrame) {
+  const states = trip.st;
+  const worst = states.map((state) => {
+    if (state[1]) return 0;
+    let w = 0;
+    for (let i = 2; i < state.length; i++) if (state[i] !== SKIPPED) w = Math.max(w, state[i]);
+    return w;
+  });
+  const end = (j) => j + 1 < states.length ? states[j + 1][0] : Math.min(trip.l + 120, lastFrame);
+  let best = 0;
+  for (let i = 0; i < states.length; i++) {
+    let held = worst[i];
+    for (let j = i; j < states.length; j++) {
+      held = Math.min(held, worst[j]);
+      if (end(j) - states[i][0] >= 120) { best = Math.max(best, held); break; }
+    }
+  }
+  return best;
+}
+
 function daySummary() {
+  const lastFrame = data.frames[data.frames.length - 1][0];
   let tracked = 0, everLate = 0, cancelled = 0, maxDelay = 0, maxTrip = null;
   for (const trip of data.trips) {
     if (!trip.st.length) continue;
     tracked++;
-    let worst = 0, wasCancelled = false;
-    for (const state of trip.st) {
-      if (state[1]) { wasCancelled = true; continue; }
-      for (let i = 2; i < state.length; i++) if (state[i] !== SKIPPED) worst = Math.max(worst, state[i]);
-    }
-    if (wasCancelled) cancelled++;
+    const worst = heldDelay(trip, lastFrame);
+    if (trip.st.some((state) => state[1])) cancelled++;
     if (worst >= 180) everLate++;
     if (worst > maxDelay) { maxDelay = worst; maxTrip = trip; }
   }
   const calls = data.frames[data.frames.length - 1][5] - data.frames[0][5];
   el("day-stats").innerHTML = [
     ["Trips with live data", tracked.toLocaleString("en")],
-    ["Delayed 3+ min at some point", `${everLate} <small class="muted">(${tracked ? Math.round((everLate / tracked) * 100) : 0}%)</small>`],
+    ["Delayed 3+ min (held 2+ min)", `${everLate} <small class="muted">(${tracked ? Math.round((everLate / tracked) * 100) : 0}%)</small>`],
     ["Cancelled", cancelled],
     ["Largest delay", maxDelay >= 60 ? `${Math.round(maxDelay / 60)} min <small class="muted">${maxTrip ? maxTrip.r : ""}</small>` : "–"],
     ["Snapshots recorded", data.frames.length.toLocaleString("en")],

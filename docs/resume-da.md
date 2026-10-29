@@ -1,7 +1,8 @@
 # rp-gtfsrt – kort resumé
 
-**Se demoen:** https://coffeeio.github.io/rp-gtfsrt/ – en hel optaget
-S-togsdag afspillet i browseren, med køreplanstid og realtid side om side.
+**Se demoen:** https://coffeeio.github.io/rp-gtfsrt/ – en optaget S-togsdag
+(onsdag 28. oktober 2026) afspillet i browseren, med køreplanstid og realtid
+side om side. Man kan skifte mellem data fra SIRI og fra API'et.
 
 **Problemet.** Google Maps og andre rejseapps viser kun køreplanstider i
 Danmark – ikke forsinkelser og aflysninger. Rejseplanen har realtidsdata og
@@ -29,21 +30,21 @@ Rejseplanens API i stedet.
   matchet, for alle operatører inklusive S-tog
 * SIRI og API optaget samme dag: når begge har en forudsigelse for samme
   stop, er de enige inden for 1 minut i 92,5 % og inden for 2 minutter i
-  98 % af tilfældene – og SIRI dækker flere ture
+  98 % af tilfældene – og SIRI når flere ture i løbet af dagen
 * Alle 44.319 ture i Danmark på én dag: 0 forkerte match
 * MobilityData's officielle GTFS-Realtime-validator: 0 fejl
 * Ingen API-kald og ingen kvote med SIRI; kører hele landet på én lille
   server
 
-**En hel S-togsdag** (fredag 23. oktober 2026, 05:00–00:30, optaget uden
-huller fra API'et):
+**S-togsdagen i demoen** (onsdag 28. oktober 2026, 07:41–21:00, fra SIRI):
 
-* 954 ture med realtidsdata
-* 125 ture (13 %) var mindst 3 minutter forsinket undervejs – den største
-  forsinkelse var 19 minutter
-* 34 aflyste ture
+* 1.015 ture med realtidsdata
+* 217 ture (21 %) var mindst 3 minutter forsinket i mindst 2 minutter
+  undervejs – den største forsinkelse var 16 minutter
+* API'et viser samme dag 10 %. Forskellen ligger mest ved de sidste stop
+  på turen, hvor SIRI forudsiger mere forsinkelse end API'et
 
-Google Maps viser i dag ingen af disse forsinkelser eller aflysninger.
+Google Maps viser i dag ingen af disse forsinkelser.
 
 **Klar til drift.** Docker-image, overvågning (Prometheus), sikker
 opdatering af køreplanen, en simulator til test uden adgang, og en guide til
